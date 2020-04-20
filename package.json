@@ -1,0 +1,14 @@
+{
+  "name": "vue-component-code-creater",
+  "version": "1.0.0",
+  "description": "Vue源代码生成工具",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "sahadev",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "2.0.4"
+  }
+}
