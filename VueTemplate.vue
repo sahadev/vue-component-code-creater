@@ -30,4 +30,5 @@ export default {
 
 <style scoped>
 /*  在此自动生成 */
+/** $stylesTemplate */
 </style>

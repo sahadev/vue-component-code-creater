@@ -10,5 +10,8 @@
   "license": "ISC",
   "devDependencies": {
     "prettier": "2.0.4"
+  },
+  "dependencies": {
+    "ora": "^4.0.3"
   }
 }

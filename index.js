@@ -1,14 +1,12 @@
 const file = require("fs");
 const vueTemplate = require("./template/index");
 const fileHelper = require("./fileHelper/index");
+const logger = require('./utils/logger');
 
 const execute = function (filePath) {
-  console.info(`filePath -> ${filePath}`);
+  logger.start(` - Start execute file: ${filePath}`);
   const fileContent = file.readFileSync(filePath);
-  console.info(`fileContent -> ${fileContent}`);
   const jsonObj = JSON.parse(fileContent);
-  console.info(`jsonObj -> ${jsonObj}`);
-
   parseJson(jsonObj);
 
   // 生成执行结果
@@ -38,18 +36,30 @@ function parseJson(json) {
 
 // 将所有需要替换的内容通过装饰器逐步替换
 function replaceKeyInfo() {
-  return replaceMethods(getVueTemplate());
+  return replaceStyles(replaceMethods(getVueTemplate()));
 }
 
-// 替换单个方法
+// 从模板中替换方法
 function replaceMethods(template) {
   return template.replace("// $eventMethods", convertMethods());
 }
 
-// 生成一个方法
+// 从木板中替换样式
+function replaceStyles(template) {
+  return template.replace("/** $stylesTemplate */", convertStyles());
+}
+
+
+// 合成方法集
 function convertMethods() {
   const methodsStr = [...methodSet].map(generateFunction);
   return methodsStr.join(',\n');
+}
+
+// 合成style集
+function convertStyles() {
+  const classStr = [...classSet].map(generateClass);
+  return classStr.join('\n');
 }
 
 // 分发解析结果
@@ -59,7 +69,12 @@ function deliveryResult(key, value) {
       methodSet.add(value);
       break;
     case "class":
-      classSet.add(value);
+      const classes = value.split(' ');
+      classes.forEach(item => {
+        // 处理多个空字符串
+        if (!item) return;
+        classSet.add(item);
+      })
       break;
     default:
       break;

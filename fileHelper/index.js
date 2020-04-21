@@ -1,6 +1,7 @@
 const fileSystem = require("fs");
 // const prettier = require("prettier");
 const { exec } = require('child_process');
+const logger = require('../utils/logger');
 
 module.exports = {
   write: function (content) {
@@ -11,9 +12,15 @@ module.exports = {
     fileSystem.writeFile(
       fileName,
       content,
-      function (err) {
-        console.info(`文件存储结果 -> ${err} `);
-        exec(`prettier --write ${fileName}`);
+      function (error) {
+        if (error)
+          throw error
+        else {
+          setTimeout(() => {
+            logger.success('The file has been saved! Path -> ' + fileName);
+            exec(`prettier --write ${fileName}`);
+          }, 2000);
+        }
       }
     );
   },
