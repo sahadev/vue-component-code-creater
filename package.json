@@ -4,7 +4,8 @@
   "description": "Vue源代码生成工具",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "testCT": "node componentTest.js"
   },
   "author": "sahadev",
   "license": "ISC",
@@ -12,6 +13,8 @@
     "prettier": "2.0.4"
   },
   "dependencies": {
-    "ora": "^4.0.3"
+    "fast-xml-parser": "^3.16.0",
+    "ora": "^4.0.3",
+    "parse5": "^6.0.0"
   }
 }

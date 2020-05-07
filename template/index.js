@@ -2,13 +2,14 @@
 
 module.exports = function () {
   return `
-  <template></template>
+  <template> <!--在此自动生成--> </template>
 
 <script>
 export default {
   data() {
     return {
       // 在此自动生成
+      // $datas
     };
   },
   beforeCreate() {},

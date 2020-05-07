@@ -8,8 +8,19 @@
       "type": "node",
       "request": "launch",
       "name": "启动调试",
-      "skipFiles": ["<node_internals>/**"],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
       "program": "${workspaceFolder}\\test.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "启动调试CT",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}\\componentTest.js"
     }
   ]
 }

@@ -19,7 +19,7 @@ module.exports = {
           setTimeout(() => {
             logger.success('The file has been saved! Path -> ' + fileName);
             exec(`prettier --write ${fileName}`);
-          }, 2000);
+          });
         }
       }
     );
