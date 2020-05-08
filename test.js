@@ -1,3 +1,3 @@
 const entry = require("./index");
 
-entry("./jsonSource/new.config.json");
+entry("./jsonSource/simple.config.json");

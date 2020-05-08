@@ -1,0 +1,55 @@
+{
+    "template": {
+        "div": {
+            "class": "grade-info-wrapper",
+            "div": [
+                {
+                    "undefined": "我的班级",
+                    "class": "grade-info-title",
+                    "span": {
+                        "style": "color: black;",
+                        "@click": "goBack",
+                        "i": {
+                            "class": "el-icon-back"
+                        }
+                    }
+                },
+                {
+                    "class": "grade-info-top",
+                    "div": {
+                        "class": "grade-info-content",
+                        "div": [
+                            {
+                                "undefined": "{{ className }}（总人数：{{ totalNum }}）",
+                                "class": "info-top"
+                            },
+                            {
+                                "class": "info-bottom",
+                                "div": [
+                                    {
+                                        "undefined": "开课日期：{{ time }}",
+                                        "class": "info-bottom-progress",
+                                        "v-if": "Number(class_status) == 1"
+                                    },
+                                    {
+                                        "undefined": "今日进度：{{ time }}",
+                                        "class": "info-bottom-progress",
+                                        "v-else-if": "Number(class_status) == 2 || Number(class_status) == 3"
+                                    },
+                                    {
+                                        "class": "info-bottom-btn",
+                                        "v-if": "subject_id === 3",
+                                        "img": {
+                                            ":src": "planImgUrl",
+                                            "alt": true
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}

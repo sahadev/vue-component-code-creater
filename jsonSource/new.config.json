@@ -117,7 +117,7 @@
                                             "el-button": [
                                                 {
                                                     "undefined": "思维挑战表扬榜",
-                                                    "v-if": "+subject_id === 2 && +dateVal[1] !== 5",
+                                                    "v-if": "+subject_id === 2 && +dateVal !== 5",
                                                     "type": "text",
                                                     "@click": "handleExportPraiseList('math')",
                                                     "span": {
@@ -147,21 +147,21 @@
                                             },
                                             "el-button": [
                                                 {
-                                                    "undefined": "未完课({{ noFinishList.length }})",
+                                                    "undefined": "未完课({{ noFinishList }})",
                                                     "size": "mini",
                                                     "class": "list-button",
                                                     "type": "primary",
                                                     "plain": true,
-                                                    ":disabled": "Number(noFinishList.length) == 0",
+                                                    ":disabled": "Number(noFinishList) == 0",
                                                     "@click": "lessonList = noFinishList"
                                                 },
                                                 {
-                                                    "undefined": "未点评({{ noCommentList.length }})",
+                                                    "undefined": "未点评({{ noCommentList }})",
                                                     "size": "mini",
                                                     "class": "list-button",
                                                     "type": "primary",
                                                     "plain": true,
-                                                    ":disabled": "Number(noCommentList.length) == 0",
+                                                    ":disabled": "Number(noCommentList) == 0",
                                                     "@click": "lessonList = noCommentList"
                                                 },
                                                 {
@@ -305,7 +305,7 @@
                                         {
                                             "class": "grade-info-bottom",
                                             "span": {
-                                                "undefined": "已选择{{ selectedLessons.length }}项",
+                                                "undefined": "已选择{{ selectedLessons }}项",
                                                 "class": "info-title"
                                             },
                                             "el-button": {
@@ -327,23 +327,23 @@
                                         "size": "mini",
                                         "el-radio-button": [
                                             {
-                                                "undefined": "在读({{\r\n                (tableDataStore[\"1\"] && tableDataStore[\"1\"].length) || 0\r\n                }})",
-                                                ":disabled": "!tableDataStore['1']",
+                                                "undefined": "在读({{\r\n                (tableDataStore) || 0\r\n                }})",
+                                                ":disabled": "!tableDataStore",
                                                 "label": 1
                                             },
                                             {
-                                                "undefined": "调入({{\r\n                (tableDataStore[\"2\"] && tableDataStore[\"2\"].length) || 0\r\n                }})",
-                                                ":disabled": "!tableDataStore['2']",
+                                                "undefined": "调入({{\r\n                (tableDataStore) || 0\r\n                }})",
+                                                ":disabled": "!tableDataStore",
                                                 "label": 2
                                             },
                                             {
-                                                "undefined": "调出({{\r\n                (tableDataStore[\"3\"] && tableDataStore[\"3\"].length) || 0\r\n                }})",
-                                                ":disabled": "!tableDataStore['3']",
+                                                "undefined": "调出({{\r\n                (tableDataStore) || 0\r\n                }})",
+                                                ":disabled": "!tableDataStore",
                                                 "label": 3
                                             },
                                             {
-                                                "undefined": "退费({{\r\n                (tableDataStore[\"4\"] && tableDataStore[\"4\"].length) || 0\r\n                }})",
-                                                ":disabled": "!tableDataStore['4']",
+                                                "undefined": "退费({{\r\n                (tableDataStore) || 0\r\n                }})",
+                                                ":disabled": "!tableDataStore",
                                                 "label": 4
                                             }
                                         ]
@@ -416,13 +416,13 @@
                                                         "width": 55
                                                     },
                                                     {
-                                                        "v-if": "+cloList[0] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "prop": "id",
                                                         "label": "ID",
                                                         "width": 120
                                                     },
                                                     {
-                                                        "v-if": "+cloList[1] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "prop": "name",
                                                         "label": "学员姓名",
                                                         "template": {
@@ -443,7 +443,7 @@
                                                         "label": "是否绑定",
                                                         "show-overflow-tooltip": true,
                                                         "width": 80,
-                                                        "v-if": "+cloList[2] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "template": {
                                                             "slot-scope": "scope",
                                                             "span": [
@@ -462,7 +462,7 @@
                                                         "label": "是否进群",
                                                         "show-overflow-tooltip": true,
                                                         "width": 80,
-                                                        "v-if": "+cloList[3] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "template": {
                                                             "slot-scope": "scope",
                                                             "span": [
@@ -482,10 +482,10 @@
                                                         "show-overflow-tooltip": true,
                                                         "prop": "finish",
                                                         "width": 100,
-                                                        "v-if": "+cloList[4] === 1"
+                                                        "v-if": "+cloList === 1"
                                                     },
                                                     {
-                                                        "v-if": "+cloList[14] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "label": "已点评率",
                                                         "show-overflow-tooltip": true,
                                                         "template": {
@@ -503,7 +503,7 @@
                                                         }
                                                     },
                                                     {
-                                                        "v-if": "+cloList[15]=== 1",
+                                                        "v-if": "+cloList=== 1",
                                                         "label": "未点评",
                                                         "width": 80,
                                                         "template": {
@@ -530,7 +530,7 @@
                                                         "label": "是否转化",
                                                         "show-overflow-tooltip": true,
                                                         "width": 80,
-                                                        "v-if": "course_type == 1 && class_status !== 1 && +cloList[5] === 1",
+                                                        "v-if": "course_type == 1 && class_status !== 1 && +cloList === 1",
                                                         "template": {
                                                             "slot-scope": "scope",
                                                             "span": [
@@ -547,7 +547,7 @@
                                                         }
                                                     },
                                                     {
-                                                        "v-if": "+cloList[6] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "label": "手机号",
                                                         "template": {
                                                             "slot-scope": "scope",
@@ -584,43 +584,43 @@
                                                         }
                                                     },
                                                     {
-                                                        "v-if": "+cloList[        7   ] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "prop": "call_in_time",
                                                         "label": "调入时间",
                                                         "width": 200
                                                     },
                                                     {
-                                                        "v-if": "+cloList[   8 ] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "prop": "call_out_cls",
                                                         "label": "调出班级",
                                                         "width": 200
                                                     },
                                                     {
-                                                        "v-if": "+cloList[ 9  ] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "prop": "call_out_tch",
                                                         "label": "辅导老师",
                                                         "width": 200
                                                     },
                                                     {
-                                                        "v-if": "+cloList[10 ] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "prop": "call_out_time",
                                                         "label": "调出时间",
                                                         "width": 200
                                                     },
                                                     {
-                                                        "v-if": "+cloList[ 11 ] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "prop": "call_in_cls",
                                                         "label": "调入班级",
                                                         "width": 200
                                                     },
                                                     {
-                                                        "v-if": "+cloList[  12] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "prop": "call_in_tch",
                                                         "label": "辅导老师",
                                                         "width": 200
                                                     },
                                                     {
-                                                        "v-if": "+cloList[ 13 ] === 1",
+                                                        "v-if": "+cloList === 1",
                                                         "prop": "refund_time",
                                                         "label": "退费时间",
                                                         "width": 200
@@ -631,7 +631,7 @@
                                         {
                                             "class": "grade-info-bottom",
                                             "span": {
-                                                "undefined": "已选择{{ selectedPeopleArr.length} }项",
+                                                "undefined": "已选择{{ selectedPeopleArr} }项",
                                                 "class": "info-title"
                                             },
                                             "el-button": [
@@ -688,8 +688,7 @@
                             "undefined": "{ {item.cls_name} }({{item.stu_num}}人)",
                             "v-for": "(item) in convertIntoClassList",
                             "v-bind:key": "item.biz_cls_id",
-                            ":label": "item.biz_cls_id",
-                            ":class": "[block]"
+                            ":label": "item.biz_cls_id"
                         }
                     },
                     "span": {

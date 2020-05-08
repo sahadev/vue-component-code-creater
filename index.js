@@ -10,11 +10,20 @@ let classSet = new Set();
 let methodSet = new Set();
 // 数据引用放入其中
 let dataSet = new Set();
+const rawAdd = Set.prototype.add;
+Set.prototype.add = function (value) {
+  if (typeof value === "string" && checkKeyword(value))
+    rawAdd.apply(this, arguments);
+}
 // 解析后的Json对象
 let jsonObj = null;
 
+function checkKeyword(value) {
+  return value != 'true' && value != 'false';
+}
+
 const execute = function (filePath) {
-  logger.start(` - Start execute file: ${filePath}`);
+  logger.start(` - Start execute file: ${filePath}\n`);
   const fileContent = file.readFileSync(filePath);
   jsonObj = JSON.parse(fileContent);
   parseJson(jsonObj);
@@ -86,35 +95,37 @@ function deliveryResult(key, value) {
       if (!item) return;
       classSet.add(item);
     })
-  } else if ((/^v-on/g.test(key) || /^@/g.test(key))) {
+  } else if ((/^v-on/g.test(key) || /^@/g.test(key))) { // 匹配@,v-on
     let expresionArray = null;
     if (checkIsVar(value)) {
       methodSet.add(value);
     } else if ((expresionArray = findVarFormExpression(value)).length > 0) {
-      methodSet.add(...expresionArray);
+      // 如果是表达式的话，则一定代表是变量参与了运算
+      expresionArray.forEach(element => {
+        dataSet.add(element);
+      });
     }
-  } else if (/^v-/g.test(key)) {
+    // TODO 支持自定义传参情况：handleJump(scope.row.id, scope.row.name)
+  } else if (/^v-/g.test(key) || /^:+/g.test(key)) {// 匹配v-,:(v-bind)
     let expresionArray = null;
     if (checkIsVar(value)) {
       dataSet.add(value);
     } else if ((expresionArray = findVarFormExpression(value)).length > 0) {
-      dataSet.add(...expresionArray);
+      expresionArray.forEach(element => {
+        dataSet.add(element);
+      });
     }
-  } else if (key === "undefined") {
-    if (/^[{]{2}.+[}]{2}$/g.test(value)) {
+  } else if (key === "undefined") { // 匹配v-text,{{}}
+    if (/[{]{2}.+[}]{2}/g.test(value)) {
       // 用于匹配v-text {{}}
-      dataSet.add(...findVarFormExpression(value));
+      const temp = findVarFormExpression(value);
+      temp.forEach(element => {
+        dataSet.add(element);
+      });
     }
-  } else if (/^:+/g.test(key) && checkIsVar(value)) {
-    dataSet.add(value);
-  } else {
+  } else { // 对于不支持的，以日志输出，方便排查
     console.info(`key: ${key}, value: ${value}`);
   }
-
-  // 支持复杂表达式以及复杂v-text
-  // {{ className }}（总人数：{{ totalNum }}
-  // +subject_id === 1 || +subject_id === 3
-  // subject_id === 3
 }
 
 /**
@@ -130,7 +141,16 @@ function checkIsVar(value) {
  * @param {*} expression 
  */
 function findVarFormExpression(expression) {
-  return expression.match(/[_a-z]{1}[_0-9a-zA-Z]*/g);
+  if (typeof expression === "string") {
+    let temp = expression.match(/[_a-z]{1}[_0-9a-zA-Z]*/g);
+    if (!temp) {
+      temp = [];
+    }
+    return temp;
+  }
+  else {
+    return []
+  };
 }
 
 function generateResult() {
