@@ -1,27 +1,17 @@
-const fileSystem = require("fs");
-// const prettier = require("prettier");
-const { exec } = require('child_process');
-const logger = require('../utils/logger');
+import fileSystem from "fs";
 
-module.exports = {
-  write: function (content) {
-    // content = prettier.format(content, {
-    //   vueIndentScriptAndStyle: true,
-    // });
+export default {
+  write: function (content, callback) {
     const fileName = `./dist/template${new Date().getTime()}.vue`;
     fileSystem.writeFile(
       fileName,
       content,
       function (error) {
-        if (error)
-          throw error
-        else {
-          setTimeout(() => {
-            logger.success('The file has been saved! Path -> ' + fileName);
-            exec(`prettier --write ${fileName}`);
-          });
-        }
+        callback(error, fileName)
       }
     );
   },
+  read: function (path) {
+    return fileSystem.readFileSync(path);
+  }
 };

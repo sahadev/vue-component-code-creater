@@ -1,4 +1,4 @@
-const ora = require('ora');
+import ora from 'ora';
 
 const spinner = ora({
     text: '正在生成',
@@ -6,7 +6,7 @@ const spinner = ora({
     color: 'blue'
 });
 
-module.exports = {
+export default {
     start(message) {
         spinner.text = message;
         spinner.start();

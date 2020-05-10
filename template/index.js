@@ -1,6 +1,6 @@
 // 导出组件模板文件
 
-module.exports = function () {
+export default function () {
   return `
   <template> <!--在此自动生成--> </template>
 

@@ -1,3 +1,3 @@
-const entry = require("./index");
+const { execute } = require("./product/bundle");
 
-entry("./jsonSource/simple.config.json");
+execute("./jsonSource/simple.config.json");

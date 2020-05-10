@@ -1,6 +1,6 @@
 'use strict';
 //parse Empty Node as self closing node
-const buildOptions = require('./util').buildOptions;
+import { buildOptions } from './util';
 
 const defaultOptions = {
   attributeNamePrefix: '@_',
@@ -277,4 +277,4 @@ function isCDATA(name) {
 //indentation
 //\n after each closing or self closing tag
 
-module.exports = Parser;
+export default Parser;

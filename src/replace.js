@@ -36,21 +36,15 @@ function convertDatas(set) {
 
 
 // 从模板中替换方法
-function replaceMethods(template, set) {
+export function replaceMethods(template, set) {
     return template.replace("// $eventMethods", convertMethods(set));
 }
 
 // 从模板中替换样式
-function replaceStyles(template, set) {
+export function replaceStyles(template, set) {
     return template.replace("/** $stylesTemplate */", convertStyles(set));
 }
 // 从模板中替换样式
-function replaceDatas(template, set) {
+export function replaceDatas(template, set) {
     return template.replace("// $datas", convertDatas(set));
-}
-
-module.exports = {
-    replaceDatas,
-    replaceMethods,
-    replaceStyles
 }

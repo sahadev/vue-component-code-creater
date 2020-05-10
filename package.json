@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "node test.js",
-    "testCT": "node componentTest.js"
+    "testCT": "node componentTest.js",
+    "build": "rollup index.js --file ./product/bundle.js --format cjs",
+    "buildCore": "rollup ./src/core.js --file ./product/bundle-core.js --format es --intro \"//This is core file\"",
+    "bt": "yarn build && yarn test"
   },
   "author": "sahadev",
   "license": "ISC",
