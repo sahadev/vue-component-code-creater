@@ -1,7 +1,7 @@
 import fileHelper from "./fileHelper/index";
 import logger from './utils/logger';
 import { exec } from 'child_process';
-import outputVueCode from "./src/core.js";
+import { outputVueCode } from "./src/core.js";
 
 /**
  * 根据指定文件读取

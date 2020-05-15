@@ -20,11 +20,17 @@ function checkKeyword(value) {
     return value != 'true' && value != 'false';
 }
 
+export function clearDataSet(){
+    classSet.clear();
+    methodSet.clear();
+    dataSet.clear();
+}
+
 /**
  * 直接输入Json
  * @param {*} json 
  */
-function outputVueCode(json) {
+export function outputVueCode(json) {
     jsonObj = JSON.parse(json);
     parseJson(jsonObj);
 
@@ -165,5 +171,3 @@ function generateResult() {
 function getVueTemplate() {
     return vueTemplate();
 }
-
-export default outputVueCode;
