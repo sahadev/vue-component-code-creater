@@ -84,6 +84,7 @@ function replaceHtmlTemplate(template) {
     };
 
     const parser = new Parser(defaultOptions);
+    debugger
     const xml = parser.parse(jsonObj.template);
 
     return template.replace("<!--在此自动生成-->", xml);

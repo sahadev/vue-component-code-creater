@@ -95,7 +95,23 @@ Parser.prototype.j2x = function (jObj, level) {
       val += this.indentate(level) + '<' + key + '/' + this.tagEndChar;
     } else if (jObj[key] instanceof Date) {
       val += this.buildTextNode(jObj[key], key, '', level);
-    } else if (typeof jObj[key] !== 'object') {
+    } else if (key === '__children'){ // 生成子节点
+      const item = jObj[key];
+
+      if(item instanceof Array){
+        item.forEach(i =>{
+          const result = this.j2x(i, level + 1);
+          val += result.val;
+        })
+      } else 
+      if (typeof item === 'object') {
+        console.info(`不应该出现的意外`)
+      } else {
+        val += this.buildTextNode(item, key, '', level);
+      }
+    } 
+    
+    else if (typeof jObj[key] !== 'object') {
       //premitive type
       const attr = this.isAttribute(key);
 
@@ -129,7 +145,10 @@ Parser.prototype.j2x = function (jObj, level) {
           val += this.buildTextNode(jObj[key], key, '', level);
         }
       }
-    } else if (Array.isArray(jObj[key])) {
+    }
+    
+    
+    else if (Array.isArray(jObj[key])) {
       //repeated nodes
       if (this.isCDATA(key)) {
         val += this.indentate(level);
@@ -196,7 +215,7 @@ function replaceCDATAarr(str, cdata) {
 function buildObjectNode(val, key, attrStr, level) {
   if (attrStr && !val.includes('<')) {
 
-    if (key === "img") {
+    if (key === "img" || key === "input") {
       return (this.indentate(level) + '<' + key + attrStr + '/>');
     }
 
