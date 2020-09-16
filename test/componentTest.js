@@ -1,4 +1,5 @@
 var parser = require('fast-xml-parser');
+const convertToJson = require('../utils/convertToJson');
 const prettier = require("prettier");
 
 var options = {
@@ -19,10 +20,10 @@ const xmlData = fs.readFileSync('./test/test.vue', {
 
 // Intermediate obj
 var tObj = parser.getTraversalObj(xmlData, options);
-var jsonObj = parser.convertToJson(tObj, options);
+debugger
+var jsonObj = convertToJson(tObj, options);
 
 delete jsonObj.script;
 delete jsonObj.style;
-
 
 console.info(JSON.stringify(jsonObj));

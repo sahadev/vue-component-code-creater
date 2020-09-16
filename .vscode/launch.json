@@ -20,7 +20,7 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}\\componentTest.js"
+      "program": "${workspaceFolder}/test/componentTest.js"
     }
   ]
 }
