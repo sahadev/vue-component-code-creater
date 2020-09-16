@@ -1,8 +1,8 @@
 "use strict";
 
-const util = require("./utils2");
+import util from "./utils2.js";
 
-const convertToJson = function (node, options) {
+export default function convertToJson(node, options) {
   const jObj = {};
 
   //when no child node or attr is present
@@ -60,6 +60,4 @@ const convertToJson = function (node, options) {
 
   //add value
   return jObj;
-};
-
-module.exports = convertToJson;
+}

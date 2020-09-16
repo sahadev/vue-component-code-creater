@@ -7,7 +7,10 @@
     "test": "node ./test/test.js",
     "testCT": "node ./test/componentTest.js",
     "build": "rollup index.js --file ./product/bundle.js --format cjs",
+    "buildOutput": "npm run buildCore && npm run buildHtml2Json",
     "buildCore": "rollup ./src/core.js --file ./product/bundle-core.js --format es --intro \"//This is core file\"",
+    "buildHtml2Json": "rollup ./src/html2Json.js --file ./product/bundle-html2json.js --format es --intro \"//This is core convert file\"",
+    "buildHtml2Json4CJS": "rollup ./src/html2Json.js --file ./product/bundle-html2json-cjs.js --format cjs --intro \"//This is core convert file\"",
     "buildCore4CJS": "rollup ./src/core.js --file ./product/bundle-core-cjs.js --format cjs --intro \"//This is core file\"",
     "bt": "yarn build && yarn test"
   },
