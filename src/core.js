@@ -40,8 +40,9 @@ export function outputVueCode(json) {
  * 输入Json对象
  * @param {*} jsonObj 
  */
-export function outputVueCodeWithJsonObj(jsonObj) {
-  parseJson(jsonObj);
+export function outputVueCodeWithJsonObj(_jsonObj) {
+  jsonObj = _jsonObj
+  parseJson(_jsonObj);
 
   // 对集合进行排序
   dataSet = sort(dataSet);
