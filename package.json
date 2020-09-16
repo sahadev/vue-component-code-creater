@@ -8,6 +8,7 @@
     "testCT": "node ./test/componentTest.js",
     "build": "rollup index.js --file ./product/bundle.js --format cjs",
     "buildCore": "rollup ./src/core.js --file ./product/bundle-core.js --format es --intro \"//This is core file\"",
+    "buildCore4CJS": "rollup ./src/core.js --file ./product/bundle-core-cjs.js --format cjs --intro \"//This is core file\"",
     "bt": "yarn build && yarn test"
   },
   "author": "sahadev",

@@ -8,7 +8,6 @@
       <el-radio :label="6">备选项 T1</el-radio>
     </el-radio-group>
     <el-radio :label="6" id="GohcwnEA">备选项 T1</el-radio>
-
     <el-form ref="form" :model="form" label-width="80px">
       <el-form-item label="活动名称">
         <el-input v-model="form.name"></el-input>
@@ -25,7 +24,7 @@
             type="date"
             placeholder="选择日期"
             v-model="form.date1"
-            style="width: 100%"
+            style="width: 100%;"
           ></el-date-picker>
         </el-col>
         <el-col class="line" :span="2">-</el-col>
@@ -33,7 +32,7 @@
           <el-time-picker
             placeholder="选择时间"
             v-model="form.date2"
-            style="width: 100%"
+            style="width: 100%;"
           ></el-time-picker>
         </el-col>
       </el-form-item>
@@ -59,107 +58,8 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">立即创建</el-button>
-        <el-button>取消</el-button>
+        <el-button> 取消 </el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
-<script>
-export default {
-  data() {
-    return {
-      radio: 3,
-      checkList: ["选中且禁用", "复选框 A"],
-      input: "",
-      num: 1,
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄",
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-      ],
-      tags: [
-        { name: "标签一", type: "" },
-        { name: "标签二", type: "success" },
-        { name: "标签三", type: "info" },
-        { name: "标签四", type: "warning" },
-        { name: "标签五", type: "danger" },
-      ],
-      form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: "",
-      },
-    };
-  },
-  methods: {
-    onSubmit() {
-      console.log("submit!");
-    },
-    onClick() {
-      console.log("onClick!");
-    },
-    handleChange() {},
-  },
-};
-</script>
-<style scoped>
-.border {
-  border: 1px solid black;
-}
-.el-header,
-.el-footer {
-  background-color: #b3c0d1;
-  color: #333;
-  text-align: center;
-  line-height: 60px;
-}
-
-.el-aside {
-  background-color: #d3dce6;
-  color: #333;
-  text-align: center;
-  line-height: 200px;
-}
-
-.el-main {
-  background-color: #e9eef3;
-  color: #333;
-  text-align: center;
-  line-height: 160px;
-}
-
-body > .el-container {
-  margin-bottom: 40px;
-}
-
-.el-container:nth-child(5) .el-aside,
-.el-container:nth-child(6) .el-aside {
-  line-height: 260px;
-}
-
-.el-container:nth-child(7) .el-aside {
-  line-height: 320px;
-}
-</style>
