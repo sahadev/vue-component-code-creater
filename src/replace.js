@@ -11,10 +11,8 @@ function generateClass(className) {
 
 // 生成一个键值对
 function generateData(dataName) {
-    return `${dataName}:null`;
+    return `${dataName}:''`;
 }
-
-
 
 // 合成方法集
 function convertMethods(set) {
