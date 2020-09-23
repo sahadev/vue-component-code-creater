@@ -20,6 +20,7 @@ const xmlData = fs.readFileSync("./test/test.vue", {
 
 // Intermediate obj
 var jsonObj = convertToJson(xmlData);
+jsonObj = jsonObj.__children[0];
 
 delete jsonObj.script;
 delete jsonObj.style;

@@ -10,6 +10,8 @@ export default function html2Json(htmlData) {
     allowBooleanAttributes: true,
 
     parseAttributeValue: true,
+    
+    textNodeName:"__value__"
   };
   const tObj = parser.getTraversalObj(htmlData, options);
   const jsonObj = convertToJson(tObj, options);

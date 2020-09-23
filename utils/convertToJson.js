@@ -25,7 +25,7 @@ export default function convertToJson(node, options) {
         )
       ) {
         if (options.arrayMode === "strict") {
-          jObj[options.textNodeName] = [node.val];
+          // jObj[options.textNodeName] = [node.val];
         } else {
           jObj[options.textNodeName] = node.val;
         }
@@ -39,7 +39,7 @@ export default function convertToJson(node, options) {
   for (let index = 0; index < keys.length; index++) {
     const tagname = keys[index];
     if (node.child[tagname] && node.child[tagname].length > 1) {
-      jObj["__children"] = [];
+      if (!jObj["__children"]) jObj["__children"] = [];
       for (const tag in node.child[tagname]) {
         const newObj = {};
         newObj[tagname] = convertToJson(node.child[tagname][tag], options);
@@ -47,13 +47,24 @@ export default function convertToJson(node, options) {
       }
     } else {
       if (options.arrayMode === true) {
-        const result = convertToJson(node.child[tagname][0], options);
-        if (typeof result === "object") jObj[tagname] = [result];
-        else jObj[tagname] = result;
+        // const result = convertToJson(node.child[tagname][0], options);
+        // if (typeof result === "object") {
+        //   if (!jObj["__children"]) {
+        //     jObj["__children"] = [];
+        //   }
+        //   jObj["__children"].push(result);
+        // } else {
+        //   jObj[tagname] = result;
+        // }
       } else if (options.arrayMode === "strict") {
-        jObj[tagname] = [convertToJson(node.child[tagname][0], options)];
+        // jObj[tagname] = [convertToJson(node.child[tagname][0], options)];
       } else {
-        jObj[tagname] = convertToJson(node.child[tagname][0], options);
+        if (!jObj["__children"]) {
+          jObj["__children"] = [];
+        }
+        const newObj = {};
+        newObj[tagname] = convertToJson(node.child[tagname][0], options);
+        jObj["__children"].push(newObj);
       }
     }
   }
