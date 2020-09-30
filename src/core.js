@@ -30,18 +30,18 @@ export function clearDataSet() {
  * 直接输入Json
  * @param {*} json
  */
-export function outputVueCode(json) {
+export function outputVueCode(json, options = {}) {
   jsonObj = JSON.parse(json);
 
-  return outputVueCodeWithJsonObj(jsonObj);
+  return outputVueCodeWithJsonObj(jsonObj, options);
 }
 
 /**
  * 输入Json对象
- * @param {*} jsonObj 
+ * @param {*} jsonObj
  */
-export function outputVueCodeWithJsonObj(_jsonObj) {
-  jsonObj = _jsonObj
+export function outputVueCodeWithJsonObj(_jsonObj, options = {}) {
+  jsonObj = _jsonObj;
   parseJson(_jsonObj);
 
   // 对集合进行排序
@@ -50,7 +50,7 @@ export function outputVueCodeWithJsonObj(_jsonObj) {
   classSet = sort(classSet);
 
   // 生成执行结果
-  return generateResult();
+  return generateResult(options);
 }
 
 function sort(set) {
@@ -74,11 +74,12 @@ function parseJson(json) {
 }
 
 // 将所有需要替换的内容通过装饰器逐步替换
-function replaceKeyInfo() {
+function replaceKeyInfo(options) {
   return replaceStyles(
     replaceDatas(
       replaceMethods(replaceHtmlTemplate(getVueTemplate()), methodSet),
-      dataSet
+      dataSet,
+      options
     ),
     classSet
   );
@@ -173,14 +174,14 @@ function findVarFormExpression(expression) {
   }
 }
 
-function generateResult() {
+function generateResult(options) {
   // 需要输出的结果有：
   // 1.html template
   // 1) 支持解析v-model/@click/
   // 2.script template
   // 3.style template
   // 返回一个格式化后的字符串
-  return replaceKeyInfo();
+  return replaceKeyInfo(options);
 }
 
 function getVueTemplate() {
