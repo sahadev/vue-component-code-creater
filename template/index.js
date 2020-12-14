@@ -6,12 +6,16 @@ export default function () {
 
 <script>
 export default {
+  props: [],
+  components: {},
   data() {
     return {
       // 在此自动生成
       // $datas
     };
   },
+  watch: {},
+  computed: {},
   beforeCreate() {},
   created() {},
   beforeMount() {},
@@ -24,11 +28,8 @@ export default {
     request() {
       // 网络请求，可选
     },
-
     // $eventMethods
   },
-  watch: {},
-  computed: {},
   fillter: {},
 };
 </script>
@@ -37,6 +38,5 @@ export default {
 /*  在此自动生成 */
 /** $stylesTemplate */
 </style>
-
   `;
 };

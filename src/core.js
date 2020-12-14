@@ -27,7 +27,7 @@ export function clearDataSet() {
 }
 
 /**
- * 直接输入Json
+ * 直接输入Json文本
  * @param {*} json
  */
 export function outputVueCode(json, options = {}) {
