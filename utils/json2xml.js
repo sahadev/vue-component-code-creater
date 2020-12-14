@@ -18,6 +18,7 @@ const defaultOptions = {
   attrValueProcessor: function (a) {
     return a;
   },
+  attributeProtectArray: [] // 哪些属性的值为''但需要渲染出来，默认：如果value为''就不生成key=value，只生成key
 };
 
 const props = [
@@ -32,6 +33,7 @@ const props = [
   'supressEmptyNode',
   'tagValueProcessor',
   'attrValueProcessor',
+  'attributeProtectArray'
 ];
 
 function Parser(options) {
@@ -115,16 +117,18 @@ Parser.prototype.j2x = function (jObj, level) {
       //premitive type
       const attr = this.isAttribute(key);
 
-      if (key === 'undefined') {
-        val = jObj[key];
+      if (key === '__text__') {
+        val = jObj[key] + val; // 2020年12月14日19:35:54 文本内容通常在子节点之前
         continue;
       }
 
       if (attr) {
         if (typeof jObj[key] === "boolean" && jObj[key]) {
           attrStr += ` ${key} `
-        } else {
+        } else if(jObj[key] || this.options.attributeProtectArray.includes(key)){
           attrStr += ' ' + key + '="' + this.options.attrValueProcessor('' + jObj[key]) + '"';
+        } else {
+          attrStr += ' ' + key;
         }
 
       } else if (this.isCDATA(key)) {

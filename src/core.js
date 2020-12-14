@@ -96,10 +96,11 @@ function replaceHtmlTemplate(template) {
     format: true,
     indentBy: "  ",
     supressEmptyNode: false,
+    attributeProtectArray: [] // 哪些属性的值为''但需要渲染出来，默认：如果value为''就不生成key=value，只生成key
   };
 
   const parser = new Parser(defaultOptions);
-  const xml = parser.parse(jsonObj.template);
+  const xml = parser.parse(jsonObj.root.__children[0].template);
 
   return template.replace("<!--在此自动生成-->", xml);
 }
@@ -135,7 +136,7 @@ function deliveryResult(key, value) {
         dataSet.add(element);
       });
     }
-  } else if (key === "undefined") {
+  } else if (key === "__text__") {
     // 匹配v-text,{{}}
     if (/[{]{2}.+[}]{2}/g.test(value)) {
       // 用于匹配v-text {{}}
@@ -146,7 +147,8 @@ function deliveryResult(key, value) {
     }
   } else {
     // 对于不支持的，以日志输出，方便排查
-    console.info(`key: ${key}, value: ${value}`);
+    // console.info(`key: ${key}, value: ${value}`);
+    // 通过回调给业务实现方做处理
   }
 }
 

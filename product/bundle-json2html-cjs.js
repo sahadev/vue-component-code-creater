@@ -132,8 +132,8 @@ Parser.prototype.j2x = function (jObj, level) {
       //premitive type
       const attr = this.isAttribute(key);
 
-      if (key === 'undefined') {
-        val = jObj[key];
+      if (key === '__text__') {
+        val = jObj[key] + val; // 2020年12月14日19:35:54 文本内容通常在子节点之前
         continue;
       }
 

@@ -65,7 +65,6 @@
         <el-button size="small" type="primary" id="b6m1sb7O2x">点击上传</el-button>
         <div slot="tip" class="el-upload__tip" id="LWDRdD0K55">只能上传jpg/png文件，且不超过500kb</div>
       </el-upload>
-
       <div lc-mark style="max-width:400px;font-size:12px;">用户头像上传:
         <el-upload class="avatar-uploader" action="https://jsonplaceholder.typicode.com/posts/" :show-file-list="false"
           :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
@@ -73,7 +72,6 @@
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </div>
-
       <div lc-mark style="max-width:400px;font-size:12px;">图片列表缩略图:
         <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/" :on-preview="handlePreview"
           :on-remove="handleRemove" :file-list="fileList" list-type="picture">
@@ -81,7 +79,6 @@
           <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
         </el-upload>
       </div>
-
       <el-upload class="upload-demo" lc-mark drag action="https://jsonplaceholder.typicode.com/posts/" multiple>
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -98,6 +95,9 @@
     </div>
   </div>
 </template>
+
+
+
 <script>
 export default {
   data() {
