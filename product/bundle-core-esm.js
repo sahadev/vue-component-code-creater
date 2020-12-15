@@ -504,7 +504,8 @@ function replaceHtmlTemplate(template) {
   };
 
   const parser = new Parser(defaultOptions);
-  const xml = parser.parse(jsonObj.root.__children[0].template);
+  // 只面向代码生成使用，故jsonObj.template不做更改，2020年12月15日16:04:28
+  const xml = parser.parse(jsonObj.template);
 
   return template.replace("<!--在此自动生成-->", xml);
 }
