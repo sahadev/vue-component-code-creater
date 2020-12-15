@@ -1,6 +1,6 @@
 'use strict';
 
-//This is core convert file
+//该文件用于解析HTML，输出为Object对象
 
 Object.defineProperty(exports, '__esModule', { value: true });
 

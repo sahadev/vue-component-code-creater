@@ -11,13 +11,13 @@
   
     "buildOutput": "npm run buildCore && npm run buildHtml2Json",
 
-    "buildCore": "rollup ./src/core.js --file ./product/bundle-core-esm.js --format es --intro \"//This is core file\"",
-    "buildCore4CJS": "rollup ./src/core.js --file ./product/bundle-core-common.js --format cjs --intro \"//This is core file\"",
+    "buildCore": "rollup ./src/core.js --file ./product/bundle-core-esm.js --format es --intro \"//该文件会遍历Object，获取关键的class,事件,data, 最终拼装为一个完整的SFC文件\"",
+    "buildCore4CJS": "rollup ./src/core.js --file ./product/bundle-core-common.js --format cjs --intro \"//该文件会遍历Object，获取关键的class,事件,data, 最终拼装为一个完整的SFC文件\"",
 
-    "buildHtml2Json": "rollup ./src/html2Json.js --file ./product/bundle-html2json-esm.js --format es --intro \"//This is core convert file\"",
-    "buildHtml2Json4CJS": "rollup ./src/html2Json.js --file ./product/bundle-html2json-common.js --format cjs --intro \"//This is core convert file\"",
+    "buildHtml2Json": "rollup ./src/html2Json.js --file ./product/bundle-html2json-esm.js --format es --intro \"//该文件用于解析HTML，输出为Object对象\"",
+    "buildHtml2Json4CJS": "rollup ./src/html2Json.js --file ./product/bundle-html2json-common.js --format cjs --intro \"//该文件用于解析HTML，输出为Object对象\"",
 
-    "buildJson2Html4CJS": "rollup ./utils/json2xml.js --file ./product/bundle-json2html-common.js --format cjs --intro \"//This is auto generate file\"",
+    "buildJson2Html4CJS": "rollup ./utils/json2xml.js --file ./product/bundle-json2html-common.js --format cjs --intro \"// 该文件用于将Object对象转换为HTML\"",
     "bt": "yarn build && yarn test"
   },
   "author": "sahadev",

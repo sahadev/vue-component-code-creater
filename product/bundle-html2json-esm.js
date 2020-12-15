@@ -1,4 +1,4 @@
-//This is core convert file
+//该文件用于解析HTML，输出为Object对象
 
 const htmlparser2 = require("htmlparser2");
 

@@ -1,4 +1,4 @@
-//This is core file
+//该文件会遍历Object，获取关键的class,事件,data, 最终拼装为一个完整的SFC文件
 
 // 导出组件模板文件
 

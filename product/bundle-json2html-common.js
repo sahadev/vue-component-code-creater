@@ -1,6 +1,6 @@
 'use strict';
 
-//This is auto generate file
+// 该文件用于将Object对象转换为HTML
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
