@@ -36,7 +36,7 @@ const props = [
   'attributeProtectArray'
 ];
 
-function Parser(options) {
+export function Parser(options) {
   this.options = buildOptions(options, defaultOptions, props);
   if (this.options.ignoreAttributes || this.options.attrNodeName) {
     this.isAttribute = function (/*a*/) {
@@ -299,5 +299,3 @@ function isCDATA(name) {
 //formatting
 //indentation
 //\n after each closing or self closing tag
-
-export default Parser;

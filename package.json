@@ -6,13 +6,18 @@
   "scripts": {
     "test": "node ./test/test.js",
     "testCT": "node ./test/componentTest.js",
-    "build": "rollup index.js --file ./product/bundle.js --format cjs",
-    "buildOutput": "npm run buildCore && npm run buildHtml2Json && npm run buildJson2Html4CJS",
-    "buildCore": "rollup ./src/core.js --file ./product/bundle-core.js --format es --intro \"//This is core file\"",
-    "buildHtml2Json": "rollup ./src/html2Json.js --file ./product/bundle-html2json.js --format es --intro \"//This is core convert file\"",
-    "buildHtml2Json4CJS": "rollup ./src/html2Json.js --file ./product/bundle-html2json-cjs.js --format cjs --intro \"//This is core convert file\"",
-    "buildCore4CJS": "rollup ./src/core.js --file ./product/bundle-core-cjs.js --format cjs --intro \"//This is core file\"",
-    "buildJson2Html4CJS": "rollup ./utils/json2xml.js --file ./product/bundle-json2html-cjs.js --format cjs --intro \"//This is auto generate file\"",
+
+    "build": "rollup index.js --file ./product/bundle-common.js --format cjs",
+  
+    "buildOutput": "npm run buildCore && npm run buildHtml2Json",
+
+    "buildCore": "rollup ./src/core.js --file ./product/bundle-core-esm.js --format es --intro \"//This is core file\"",
+    "buildCore4CJS": "rollup ./src/core.js --file ./product/bundle-core-common.js --format cjs --intro \"//This is core file\"",
+
+    "buildHtml2Json": "rollup ./src/html2Json.js --file ./product/bundle-html2json-esm.js --format es --intro \"//This is core convert file\"",
+    "buildHtml2Json4CJS": "rollup ./src/html2Json.js --file ./product/bundle-html2json-common.js --format cjs --intro \"//This is core convert file\"",
+
+    "buildJson2Html4CJS": "rollup ./utils/json2xml.js --file ./product/bundle-json2html-common.js --format cjs --intro \"//This is auto generate file\"",
     "bt": "yarn build && yarn test"
   },
   "author": "sahadev",

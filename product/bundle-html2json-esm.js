@@ -1,3 +1,5 @@
+//This is core convert file
+
 const htmlparser2 = require("htmlparser2");
 
 function getNodeContent(node) {
@@ -64,6 +66,8 @@ function parseHtml(htmlData) {
   })
 }
 
-export async function html2Json(htmlData) {
+async function html2Json(htmlData) {
   return await parseHtml(htmlData);
 }
+
+export { html2Json };

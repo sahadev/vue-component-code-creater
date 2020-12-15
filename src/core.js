@@ -1,6 +1,6 @@
 import vueTemplate from "../template/index.js";
 import { replaceDatas, replaceMethods, replaceStyles } from "./replace";
-import Parser from "../utils/json2xml";
+import { Parser } from "../utils/json2xml";
 
 // 类定义放入其中
 let classSet = new Set();

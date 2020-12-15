@@ -8,12 +8,16 @@ function vueTemplate () {
 
 <script>
 export default {
+  props: [],
+  components: {},
   data() {
     return {
       // 在此自动生成
       // $datas
     };
   },
+  watch: {},
+  computed: {},
   beforeCreate() {},
   created() {},
   beforeMount() {},
@@ -26,11 +30,8 @@ export default {
     request() {
       // 网络请求，可选
     },
-
     // $eventMethods
   },
-  watch: {},
-  computed: {},
   fillter: {},
 };
 </script>
@@ -39,7 +40,6 @@ export default {
 /*  在此自动生成 */
 /** $stylesTemplate */
 </style>
-
   `;
 }
 
@@ -130,6 +130,7 @@ const defaultOptions = {
   attrValueProcessor: function (a) {
     return a;
   },
+  attributeProtectArray: [] // 哪些属性的值为''但需要渲染出来，默认：如果value为''就不生成key=value，只生成key
 };
 
 const props = [
@@ -144,6 +145,7 @@ const props = [
   'supressEmptyNode',
   'tagValueProcessor',
   'attrValueProcessor',
+  'attributeProtectArray'
 ];
 
 function Parser(options) {
@@ -225,16 +227,18 @@ Parser.prototype.j2x = function (jObj, level) {
       //premitive type
       const attr = this.isAttribute(key);
 
-      if (key === 'undefined') {
-        val = jObj[key];
+      if (key === '__text__') {
+        val = jObj[key] + val; // 2020年12月14日19:35:54 文本内容通常在子节点之前
         continue;
       }
 
       if (attr) {
         if (typeof jObj[key] === "boolean" && jObj[key]) {
           attrStr += ` ${key} `;
-        } else {
+        } else if(jObj[key] || this.options.attributeProtectArray.includes(key)){
           attrStr += ' ' + key + '="' + this.options.attrValueProcessor('' + jObj[key]) + '"';
+        } else {
+          attrStr += ' ' + key;
         }
 
       } else if (this.isCDATA(key)) {
@@ -398,6 +402,10 @@ function isCDATA(name) {
   return name === this.options.cdataTagName;
 }
 
+//formatting
+//indentation
+//\n after each closing or self closing tag
+
 // 类定义放入其中
 let classSet = new Set();
 // 事件放入其中
@@ -423,7 +431,7 @@ function clearDataSet() {
 }
 
 /**
- * 直接输入Json
+ * 直接输入Json文本
  * @param {*} json
  */
 function outputVueCode(json, options = {}) {
@@ -492,10 +500,11 @@ function replaceHtmlTemplate(template) {
     format: true,
     indentBy: "  ",
     supressEmptyNode: false,
+    attributeProtectArray: [] // 哪些属性的值为''但需要渲染出来，默认：如果value为''就不生成key=value，只生成key
   };
 
   const parser = new Parser(defaultOptions);
-  const xml = parser.parse(jsonObj.template);
+  const xml = parser.parse(jsonObj.root.__children[0].template);
 
   return template.replace("<!--在此自动生成-->", xml);
 }
@@ -531,7 +540,7 @@ function deliveryResult(key, value) {
         dataSet.add(element);
       });
     }
-  } else if (key === "undefined") {
+  } else if (key === "__text__") {
     // 匹配v-text,{{}}
     if (/[{]{2}.+[}]{2}/g.test(value)) {
       // 用于匹配v-text {{}}
@@ -540,10 +549,7 @@ function deliveryResult(key, value) {
         dataSet.add(element);
       });
     }
-  } else {
-    // 对于不支持的，以日志输出，方便排查
-    console.info(`key: ${key}, value: ${value}`);
-  }
+  } else ;
 }
 
 /**

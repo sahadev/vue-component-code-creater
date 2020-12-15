@@ -1,3 +1,9 @@
+'use strict';
+
+//This is core convert file
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
 const htmlparser2 = require("htmlparser2");
 
 function getNodeContent(node) {
@@ -64,6 +70,8 @@ function parseHtml(htmlData) {
   })
 }
 
-export async function html2Json(htmlData) {
+async function html2Json(htmlData) {
   return await parseHtml(htmlData);
 }
+
+exports.html2Json = html2Json;
