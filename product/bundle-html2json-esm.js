@@ -51,10 +51,11 @@ function parseHtml(htmlData) {
       onclosetag(tagname) {
         lastAccessStack.pop();
         currentAccessObject = lastAccessStack[lastAccessStack.length - 1];
-        if (lastAccessStack.length === 1) { // 访问栈中只保留root时，说明都遍历完了
-          resolve(root);
-        }
       },
+      onend(){
+        resolve(root);
+      },
+
       onerror(error) {
         reject(error);
       }

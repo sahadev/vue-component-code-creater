@@ -501,14 +501,14 @@ function replaceHtmlTemplate(template) {
     ignoreAttributes: false,
     cdataTagName: "__cdata", //default is false
     cdataPositionChar: "\\c",
-    format: true,
+    format: false,
     indentBy: "  ",
     supressEmptyNode: false,
     attributeProtectArray: [] // 哪些属性的值为''但需要渲染出来，默认：如果value为''就不生成key=value，只生成key
   };
 
   const parser = new Parser(defaultOptions);
-  // 只面向代码生成使用，故jsonObj.template不做更改，2020年12月15日16:04:28
+  // 只面向代码生成使用，故jsonObj.template不能变更，2020年12月15日16:04:28
   const xml = parser.parse(jsonObj.template);
 
   return template.replace("<!--在此自动生成-->", xml);
