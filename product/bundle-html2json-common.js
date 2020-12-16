@@ -49,16 +49,17 @@ function parseHtml(htmlData) {
       },
       ontext(text) {
         if (text.trim()) {
-          getNodeContent(currentAccessObject).__text__ = text;
+          getNodeContent(currentAccessObject).__text__ = text.trim();
         }
       },
       onclosetag(tagname) {
         lastAccessStack.pop();
         currentAccessObject = lastAccessStack[lastAccessStack.length - 1];
-        if (lastAccessStack.length === 1) { // 访问栈中只保留root时，说明都遍历完了
-          resolve(root);
-        }
       },
+      onend(){
+        resolve(root);
+      },
+
       onerror(error) {
         reject(error);
       }

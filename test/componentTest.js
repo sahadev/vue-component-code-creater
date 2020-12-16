@@ -8,10 +8,19 @@ const xmlData = fs.readFileSync("./test/test.vue", {
 
 (async function exec() {
   const root = await html2Json(xmlData);
-  const { outputVueCodeWithJsonObj } = require("../product/bundle-core-common");
-  var xml = outputVueCodeWithJsonObj(root);
+  const { Parser } = require("../product/bundle-json2html-common");
+
+  const parser = new Parser({
+    attributeNamePrefix: "@_",
+    attrNodeName: false, //default is false
+    textNodeName: "#text",
+    ignoreAttributes: false,
+    cdataTagName: "__cdata", //default is false
+    cdataPositionChar: "\\c",
+    format: true,
+    indentBy: "  ",
+    supressEmptyNode: false,
+  });
+  const xml = parser.parse(root.root);
   console.info(xml);
 })()
-
-
-
