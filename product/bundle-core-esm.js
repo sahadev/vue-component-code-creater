@@ -406,90 +406,21 @@ function isCDATA(name) {
 //indentation
 //\n after each closing or self closing tag
 
-// 类定义放入其中
-let classSet = new Set();
-// 事件放入其中
-let methodSet = new Set();
-// 数据引用放入其中
-let dataSet = new Set();
 const rawAdd = Set.prototype.add;
 Set.prototype.add = function (value) {
   if (typeof value === "string" && checkKeyword(value))
     rawAdd.apply(this, arguments);
 };
-// 解析后的Json对象
-let jsonObj = null;
 
 function checkKeyword(value) {
   return value != "true" && value != "false";
-}
-
-function clearDataSet() {
-  classSet.clear();
-  methodSet.clear();
-  dataSet.clear();
-}
-
-/**
- * 直接输入Json文本
- * @param {*} json
- */
-function outputVueCode(json, options = {}) {
-  jsonObj = JSON.parse(json);
-
-  return outputVueCodeWithJsonObj(jsonObj, options);
-}
-
-/**
- * 输入Json对象
- * @param {*} jsonObj
- */
-function outputVueCodeWithJsonObj(_jsonObj, options = {}) {
-  jsonObj = _jsonObj;
-  parseJson(_jsonObj);
-
-  // 对集合进行排序
-  dataSet = sort(dataSet);
-  methodSet = sort(methodSet);
-  classSet = sort(classSet);
-
-  // 生成执行结果
-  return generateResult(options);
 }
 
 function sort(set) {
   return new Set(Array.from(set).sort());
 }
 
-// 递归解析Json
-function parseJson(json) {
-  for (const key in json) {
-    if (json.hasOwnProperty(key)) {
-      const value = json[key];
-      if (value instanceof Array) {
-        value.forEach((item) => parseJson(item));
-      } else if (value instanceof Object) {
-        parseJson(value);
-      } else {
-        deliveryResult(key, value);
-      }
-    }
-  }
-}
-
-// 将所有需要替换的内容通过装饰器逐步替换
-function replaceKeyInfo(options) {
-  return replaceStyles(
-    replaceDatas(
-      replaceMethods(replaceHtmlTemplate(getVueTemplate()), methodSet),
-      dataSet,
-      options
-    ),
-    classSet
-  );
-}
-
-function replaceHtmlTemplate(template) {
+function replaceHtmlTemplate(template, jsonObj) {
   const defaultOptions = {
     attributeNamePrefix: "@_",
     attrNodeName: false, //default is false
@@ -510,47 +441,9 @@ function replaceHtmlTemplate(template) {
   return template.replace("<!--在此自动生成-->", xml);
 }
 
-// 分发解析结果
-function deliveryResult(key, value) {
-  if (key === "class") {
-    const classes = value.split(" ");
-    classes.forEach((item) => {
-      // 处理多个空字符串
-      if (!item) return;
-      classSet.add(item);
-    });
-  } else if (/^v-on/g.test(key) || /^@/g.test(key)) {
-    // 匹配@,v-on
-    let expresionArray = null;
-    if (checkIsVar(value)) {
-      methodSet.add(value);
-    } else if ((expresionArray = findVarFormExpression(value)).length > 0) {
-      // 如果是表达式的话，则一定代表是变量参与了运算
-      expresionArray.forEach((element) => {
-        dataSet.add(element);
-      });
-    }
-    // TODO 支持自定义传参情况：handleJump(scope.row.id, scope.row.name)
-  } else if (/^v-/g.test(key) || /^:+/g.test(key)) {
-    // 匹配v-,:(v-bind)
-    let expresionArray = null;
-    if (checkIsVar(value)) {
-      dataSet.add(value);
-    } else if ((expresionArray = findVarFormExpression(value)).length > 0) {
-      expresionArray.forEach((element) => {
-        dataSet.add(element);
-      });
-    }
-  } else if (key === "__text__") {
-    // 匹配v-text,{{}}
-    if (/[{]{2}.+[}]{2}/g.test(value)) {
-      // 用于匹配v-text {{}}
-      const temp = findVarFormExpression(value);
-      temp.forEach((element) => {
-        dataSet.add(element);
-      });
-    }
-  } else ;
+
+function getVueTemplate() {
+  return vueTemplate();
 }
 
 /**
@@ -577,18 +470,139 @@ function findVarFormExpression(expression) {
   }
 }
 
-function generateResult(options) {
-  // 需要输出的结果有：
-  // 1.html template
-  // 1) 支持解析v-model/@click/
-  // 2.script template
-  // 3.style template
-  // 返回一个格式化后的字符串
-  return replaceKeyInfo(options);
+class CodeGenerator {
+
+  constructor(options = {}) {
+    this.options = options;
+    // 解析后的Json对象
+    this.jsonObj = null;
+    // 类定义放入其中
+    this.classSet = new Set();
+    // 事件放入其中
+    this.methodSet = new Set();
+    // 数据引用放入其中
+    this.dataSet = new Set();
+  }
+
+  clearDataSet() {
+    this.classSet.clear();
+    this.methodSet.clear();
+    this.dataSet.clear();
+  }
+
+  /**
+    * 直接输入Json文本
+    * @param {*} json
+    */
+  outputVueCode(json) {
+    this.jsonObj = JSON.parse(json);
+    return this.outputVueCodeWithJsonObj(jsonObj);
+  }
+
+  /**
+   * 输入Json对象
+   * @param {*} jsonObj
+   */
+  outputVueCodeWithJsonObj(_jsonObj) {
+    this.jsonObj = _jsonObj;
+
+    // 解析对象
+    this.parseJson(_jsonObj);
+
+    // 对集合进行排序
+    this.dataSet = sort(this.dataSet);
+    this.methodSet = sort(this.methodSet);
+    this.classSet = sort(this.classSet);
+
+    // 生成执行结果
+    return this.generateResult();
+  }
+
+
+  // 将所有需要替换的内容通过装饰器逐步替换
+  replaceKeyInfo() {
+    // 将对象转换为html并替换
+    const templateTemp = replaceHtmlTemplate(getVueTemplate(), this.jsonObj);
+    // 生成方法
+    const methodTemp = replaceMethods(templateTemp, this.methodSet);
+    // 生成data
+    const dataTemp = replaceDatas(methodTemp, this.dataSet, this.options);
+    // 生成class
+    const styleTemp = replaceStyles(dataTemp, this.classSet);
+    return styleTemp;
+  }
+
+
+  // 分发解析结果
+  deliveryResult(key, value) {
+    if (key === "class") {
+      const classes = value.split(" ");
+      classes.forEach((item) => {
+        // 处理多个空字符串
+        if (!item) return;
+        this.classSet.add(item);
+      });
+    } else if (/^v-on/g.test(key) || /^@/g.test(key)) {
+      // 匹配@,v-on
+      let expresionArray = null;
+      if (checkIsVar(value)) {
+        this.methodSet.add(value);
+      } else if ((expresionArray = findVarFormExpression(value)).length > 0) {
+        // 如果是表达式的话，则一定代表是变量参与了运算
+        expresionArray.forEach((element) => {
+          this.dataSet.add(element);
+        });
+      }
+      // TODO 支持自定义传参情况：handleJump(scope.row.id, scope.row.name)
+    } else if (/^v-/g.test(key) || /^:+/g.test(key)) {
+      // 匹配v-,:(v-bind)
+      let expresionArray = null;
+      if (checkIsVar(value)) {
+        this.dataSet.add(value);
+      } else if ((expresionArray = findVarFormExpression(value)).length > 0) {
+        expresionArray.forEach((element) => {
+          this.dataSet.add(element);
+        });
+      }
+    } else if (key === "__text__") {
+      // 匹配v-text,{{}}
+      if (/[{]{2}.+[}]{2}/g.test(value)) {
+        // 用于匹配v-text {{}}
+        const temp = findVarFormExpression(value);
+        temp.forEach((element) => {
+          this.dataSet.add(element);
+        });
+      }
+    } else ;
+  }
+
+
+  generateResult() {
+    // 需要输出的结果有：
+    // 1.html template
+    // 1) 支持解析v-model/@click/
+    // 2.script template
+    // 3.style template
+    // 返回一个格式化后的字符串
+    return this.replaceKeyInfo();
+  }
+
+
+  // 递归解析Json
+  parseJson(json) {
+    for (const key in json) {
+      if (json.hasOwnProperty(key)) {
+        const value = json[key];
+        if (value instanceof Array) {
+          value.forEach((item) => this.parseJson(item));
+        } else if (value instanceof Object) {
+          this.parseJson(value);
+        } else {
+          this.deliveryResult(key, value);
+        }
+      }
+    }
+  }
 }
 
-function getVueTemplate() {
-  return vueTemplate();
-}
-
-export { clearDataSet, outputVueCode, outputVueCodeWithJsonObj };
+export { CodeGenerator };

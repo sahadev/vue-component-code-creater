@@ -16,7 +16,7 @@ function sort(set) {
   return new Set(Array.from(set).sort());
 }
 
-function replaceHtmlTemplate(template) {
+function replaceHtmlTemplate(template, jsonObj) {
   const defaultOptions = {
     attributeNamePrefix: "@_",
     attrNodeName: false, //default is false
@@ -32,7 +32,7 @@ function replaceHtmlTemplate(template) {
 
   const parser = new Parser(defaultOptions);
   // 只面向代码生成使用，故jsonObj.template不能变更，2020年12月15日16:04:28
-  const xml = parser.parse(this.jsonObj.template);
+  const xml = parser.parse(jsonObj.template);
 
   return template.replace("<!--在此自动生成-->", xml);
 }
@@ -67,24 +67,23 @@ function findVarFormExpression(expression) {
 }
 
 export class CodeGenerator {
-  options = {};
-  // 解析后的Json对象
-  jsonObj = null;
-  // 类定义放入其中
-  classSet = new Set();
-  // 事件放入其中
-  methodSet = new Set();
-  // 数据引用放入其中
-  dataSet = new Set();
 
-  constructor(options) {
+  constructor(options = {}) {
     this.options = options;
+    // 解析后的Json对象
+    this.jsonObj = null;
+    // 类定义放入其中
+    this.classSet = new Set();
+    // 事件放入其中
+    this.methodSet = new Set();
+    // 数据引用放入其中
+    this.dataSet = new Set();
   }
 
   clearDataSet() {
-    classSet.clear();
-    methodSet.clear();
-    dataSet.clear();
+    this.classSet.clear();
+    this.methodSet.clear();
+    this.dataSet.clear();
   }
 
   /**
@@ -107,9 +106,9 @@ export class CodeGenerator {
     this.parseJson(_jsonObj);
 
     // 对集合进行排序
-    dataSet = sort(dataSet);
-    methodSet = sort(methodSet);
-    classSet = sort(classSet);
+    this.dataSet = sort(this.dataSet);
+    this.methodSet = sort(this.methodSet);
+    this.classSet = sort(this.classSet);
 
     // 生成执行结果
     return this.generateResult();
@@ -119,7 +118,7 @@ export class CodeGenerator {
   // 将所有需要替换的内容通过装饰器逐步替换
   replaceKeyInfo() {
     // 将对象转换为html并替换
-    const templateTemp = replaceHtmlTemplate(getVueTemplate());
+    const templateTemp = replaceHtmlTemplate(getVueTemplate(), this.jsonObj);
     // 生成方法
     const methodTemp = replaceMethods(templateTemp, this.methodSet);
     // 生成data
