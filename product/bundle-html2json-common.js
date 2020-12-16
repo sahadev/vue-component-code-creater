@@ -49,7 +49,7 @@ function parseHtml(htmlData) {
       },
       ontext(text) {
         if (text.trim()) {
-          getNodeContent(currentAccessObject).__text__ = text;
+          getNodeContent(currentAccessObject).__text__ = text.trim();
         }
       },
       onclosetag(tagname) {

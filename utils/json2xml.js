@@ -9,7 +9,7 @@ const defaultOptions = {
   ignoreAttributes: true,
   cdataTagName: false,
   cdataPositionChar: '\\c',
-  format: false,
+  format: true,
   indentBy: '  ',
   supressEmptyNode: false,
   tagValueProcessor: function (a) {

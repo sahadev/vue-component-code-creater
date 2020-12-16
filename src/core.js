@@ -93,7 +93,7 @@ function replaceHtmlTemplate(template) {
     ignoreAttributes: false,
     cdataTagName: "__cdata", //default is false
     cdataPositionChar: "\\c",
-    format: false,
+    format: true,
     indentBy: "  ",
     supressEmptyNode: false,
     attributeProtectArray: [] // 哪些属性的值为''但需要渲染出来，默认：如果value为''就不生成key=value，只生成key

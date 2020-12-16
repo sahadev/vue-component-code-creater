@@ -17,7 +17,7 @@ const xmlData = fs.readFileSync("./test/test.vue", {
     ignoreAttributes: false,
     cdataTagName: "__cdata", //default is false
     cdataPositionChar: "\\c",
-    format: false,
+    format: true,
     indentBy: "  ",
     supressEmptyNode: false,
   });
