@@ -447,11 +447,17 @@ function getVueTemplate() {
 }
 
 /**
- * 检查这个值是不是符合一个变量的规则, 这里情况特殊，不可以以大写字母开头，以驼峰命名为准
+ * 获取这个变量的实际key
  * @param {*} value
  */
-function checkIsVar(value) {
-  return /^[_a-z]{1}[_0-9a-zA-Z]*$/g.test(value);
+function getVarName(value) {
+  let result = null;
+  if (/^[_a-z]{1}[_0-9a-zA-Z]*$/g.test(value)) {
+    result = value;
+  } else if (value.indexOf('.') > 0 && getVarName(value.split('.')[0])) { //这个case用于处理xxx.yy的情况，需提取出xxx
+    result = value.split('.')[0];
+  }
+  return result;
 }
 
 /**
@@ -532,7 +538,6 @@ class CodeGenerator {
     return styleTemp;
   }
 
-
   // 分发解析结果
   deliveryResult(key, value) {
     if (key === "class") {
@@ -544,25 +549,18 @@ class CodeGenerator {
       });
     } else if (/^v-on/g.test(key) || /^@/g.test(key)) {
       // 匹配@,v-on
-      let expresionArray = null;
-      if (checkIsVar(value)) {
+      if (getVarName(value)) {
         this.methodSet.add(value);
-      } else if ((expresionArray = findVarFormExpression(value)).length > 0) {
-        // 如果是表达式的话，则一定代表是变量参与了运算
-        expresionArray.forEach((element) => {
-          this.dataSet.add(element);
-        });
       }
-      // TODO 支持自定义传参情况：handleJump(scope.row.id, scope.row.name)
     } else if (/^v-/g.test(key) || /^:+/g.test(key)) {
-      // 匹配v-,:(v-bind)
-      let expresionArray = null;
-      if (checkIsVar(value)) {
-        this.dataSet.add(value);
-      } else if ((expresionArray = findVarFormExpression(value)).length > 0) {
-        expresionArray.forEach((element) => {
-          this.dataSet.add(element);
-        });
+      if (this.options.checkIsDataDirectives && this.options.checkIsDataDirectives(key)) {
+        value = getVarName(value);
+        value && this.dataSet.add(value);
+      } else if (this.options.checkIsMethodDirectives && this.options.checkIsMethodDirectives(key)) {
+        value = getVarName(value);
+        value && this.methodSet.add(value);
+      } else {
+        this.options.unSupportedKey && this.options.unSupportedKey(key, value);
       }
     } else if (key === "__text__") {
       // 匹配v-text,{{}}
@@ -573,7 +571,10 @@ class CodeGenerator {
           this.dataSet.add(element);
         });
       }
-    } else ;
+    } else {
+      // 通过回调给业务实现方做处理
+      this.options.unSupportedKey && this.options.unSupportedKey(key, value);
+    }
   }
 
 
