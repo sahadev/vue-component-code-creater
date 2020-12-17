@@ -52,6 +52,11 @@ function getVarName(value) {
     result = value;
   } else if (value.indexOf('.') > 0 && getVarName(value.split('.')[0])) { //这个case用于处理xxx.yy的情况，需提取出xxx
     result = value.split('.')[0];
+  } else if (value.indexOf('in') > 0) { // 匹配v-for="xx in yy", 提取yy
+    const temp = value.split(' in ');// 防止匹配到index这样容易混淆的变量
+    if (temp.length === 2) {
+      result = getVarName(temp[1].trim());
+    }
   }
   return result;
 }
@@ -149,12 +154,15 @@ export class CodeGenerator {
         this.methodSet.add(value);
       }
     } else if (/^v-/g.test(key) || /^:+/g.test(key)) {
+      // 优先使Method消费，因为有的:也是method
+      if (this.options.checkIsMethodDirectives && this.options.checkIsMethodDirectives(key)) {
+        value = getVarName(value);
+        value && this.methodSet.add(value);
+      } else
+      // 业务侧可能会全部消费/^:+/g.test(key)
       if (this.options.checkIsDataDirectives && this.options.checkIsDataDirectives(key)) {
         value = getVarName(value);
         value && this.dataSet.add(value);
-      } else if (this.options.checkIsMethodDirectives && this.options.checkIsMethodDirectives(key)) {
-        value = getVarName(value);
-        value && this.methodSet.add(value);
       } else {
         this.options.unSupportedKey && this.options.unSupportedKey(key, value);
       }
