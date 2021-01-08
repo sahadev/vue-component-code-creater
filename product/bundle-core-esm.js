@@ -45,7 +45,7 @@ export default {
 
 // 生成一个方法
 function generateFunction(functionName) {
-  return `${functionName}(){}`;
+  return `${functionName}: function(){}`;
 }
 
 // 生成一个class
@@ -59,15 +59,25 @@ function generateData(dataName) {
 }
 
 // 合成方法集
-function convertMethods(set) {
-  const methodsStr = [...set].map(generateFunction);
+function convertMethods(set, options) {
+  let methodsStr = [...set].map(generateFunction);
+  // 回调外部，使外部作用最后结果
+  if (options.convertMethodResult) {
+    methodsStr = options.convertMethodResult(methodsStr);
+  }
   return methodsStr.join(",\n");
 }
 
 // 合成style集
-function convertStyles(set) {
+function convertStyles(set, options) {
+  let result = '';
+  // 因为set的结果不好解析，所以优先由业务处解析，再交给默认处理方式。不过业务处需要将已处理的值从set中删除，否则会有两条样式
+  if (options.preConvertStyleResult) {
+    result = options.preConvertStyleResult(set);
+  }
+
   const classStr = [...set].map(generateClass);
-  return classStr.join("\n");
+  return classStr.join("\n") + '\n' + result;
 }
 
 // 合成data集
@@ -81,13 +91,13 @@ function convertDatas(set, options) {
 }
 
 // 从模板中替换方法
-function replaceMethods(template, set) {
-  return template.replace("// $eventMethods", convertMethods(set));
+function replaceMethods(template, set, options) {
+  return template.replace("// $eventMethods", convertMethods(set, options));
 }
 
 // 从模板中替换样式
-function replaceStyles(template, set) {
-  return template.replace("/** $stylesTemplate */", convertStyles(set));
+function replaceStyles(template, set, options) {
+  return template.replace("/** $stylesTemplate */", convertStyles(set, options));
 }
 // 从模板中替换样式
 function replaceDatas(template, set, options) {
@@ -535,11 +545,11 @@ class CodeGenerator {
     // 将对象转换为html并替换
     const templateTemp = replaceHtmlTemplate(getVueTemplate(), this.jsonObj);
     // 生成方法
-    const methodTemp = replaceMethods(templateTemp, this.methodSet);
+    const methodTemp = replaceMethods(templateTemp, this.methodSet, this.options);
     // 生成data
     const dataTemp = replaceDatas(methodTemp, this.dataSet, this.options);
     // 生成class
-    const styleTemp = replaceStyles(dataTemp, this.classSet);
+    const styleTemp = replaceStyles(dataTemp, this.classSet, this.options);
     return styleTemp;
   }
 

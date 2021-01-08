@@ -131,11 +131,11 @@ export class CodeGenerator {
     // 将对象转换为html并替换
     const templateTemp = replaceHtmlTemplate(getVueTemplate(), this.jsonObj);
     // 生成方法
-    const methodTemp = replaceMethods(templateTemp, this.methodSet);
+    const methodTemp = replaceMethods(templateTemp, this.methodSet, this.options);
     // 生成data
     const dataTemp = replaceDatas(methodTemp, this.dataSet, this.options);
     // 生成class
-    const styleTemp = replaceStyles(dataTemp, this.classSet);
+    const styleTemp = replaceStyles(dataTemp, this.classSet, this.options);
     return styleTemp;
   }
 

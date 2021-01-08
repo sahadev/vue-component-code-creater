@@ -41,8 +41,9 @@ export default function convertToJson(node, options) {
     if (node.child[tagname] && node.child[tagname].length > 1) {
       if (!jObj["__children"]) jObj["__children"] = [];
       for (const tag in node.child[tagname]) {
-        const newObj = {};
-        newObj[tagname] = convertToJson(node.child[tagname][tag], options);
+        const newObj = {
+          [tagname]: convertToJson(node.child[tagname][tag], options)
+        };
         jObj["__children"].push(newObj);
       }
     } else {
@@ -62,8 +63,9 @@ export default function convertToJson(node, options) {
         if (!jObj["__children"]) {
           jObj["__children"] = [];
         }
-        const newObj = {};
-        newObj[tagname] = convertToJson(node.child[tagname][0], options);
+        const newObj = {
+          [tagname]: convertToJson(node.child[tagname][0], options)
+        };
         jObj["__children"].push(newObj);
       }
     }
