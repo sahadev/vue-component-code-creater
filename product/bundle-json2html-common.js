@@ -234,7 +234,7 @@ function replaceCDATAarr(str, cdata) {
 function buildObjectNode(val, key, attrStr, level) {
   if (attrStr && !val.includes('<')) {
 
-    if (key === "img" || key === "input") {
+    if (key === "img" || key === "a-icon" || key === "input") {
       return (this.indentate(level) + '<' + key + attrStr + '/>');
     }
 

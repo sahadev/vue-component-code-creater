@@ -49,7 +49,7 @@ export default {
 
 // 生成一个方法
 function generateFunction(functionName) {
-  return `${functionName}(){}`;
+  return `${functionName}: function(){}`;
 }
 
 // 生成一个class
@@ -63,15 +63,25 @@ function generateData(dataName) {
 }
 
 // 合成方法集
-function convertMethods(set) {
-  const methodsStr = [...set].map(generateFunction);
+function convertMethods(set, options) {
+  let methodsStr = [...set].map(generateFunction);
+  // 回调外部，使外部作用最后结果
+  if (options.convertMethodResult) {
+    methodsStr = options.convertMethodResult(methodsStr);
+  }
   return methodsStr.join(",\n");
 }
 
 // 合成style集
-function convertStyles(set) {
+function convertStyles(set, options) {
+  let result = '';
+  // 因为set的结果不好解析，所以优先由业务处解析，再交给默认处理方式。不过业务处需要将已处理的值从set中删除，否则会有两条样式
+  if (options.preConvertStyleResult) {
+    result = options.preConvertStyleResult(set);
+  }
+
   const classStr = [...set].map(generateClass);
-  return classStr.join("\n");
+  return classStr.join("\n") + '\n' + result;
 }
 
 // 合成data集
@@ -85,13 +95,13 @@ function convertDatas(set, options) {
 }
 
 // 从模板中替换方法
-function replaceMethods(template, set) {
-  return template.replace("// $eventMethods", convertMethods(set));
+function replaceMethods(template, set, options) {
+  return template.replace("// $eventMethods", convertMethods(set, options));
 }
 
 // 从模板中替换样式
-function replaceStyles(template, set) {
-  return template.replace("/** $stylesTemplate */", convertStyles(set));
+function replaceStyles(template, set, options) {
+  return template.replace("/** $stylesTemplate */", convertStyles(set, options));
 }
 // 从模板中替换样式
 function replaceDatas(template, set, options) {
@@ -329,7 +339,7 @@ function replaceCDATAarr(str, cdata) {
 function buildObjectNode(val, key, attrStr, level) {
   if (attrStr && !val.includes('<')) {
 
-    if (key === "img" || key === "input") {
+    if (key === "img" || key === "a-icon" || key === "input") {
       return (this.indentate(level) + '<' + key + attrStr + '/>');
     }
 
@@ -410,90 +420,21 @@ function isCDATA(name) {
 //indentation
 //\n after each closing or self closing tag
 
-// 类定义放入其中
-let classSet = new Set();
-// 事件放入其中
-let methodSet = new Set();
-// 数据引用放入其中
-let dataSet = new Set();
 const rawAdd = Set.prototype.add;
 Set.prototype.add = function (value) {
   if (typeof value === "string" && checkKeyword(value))
     rawAdd.apply(this, arguments);
 };
-// 解析后的Json对象
-let jsonObj = null;
 
 function checkKeyword(value) {
   return value != "true" && value != "false";
-}
-
-function clearDataSet() {
-  classSet.clear();
-  methodSet.clear();
-  dataSet.clear();
-}
-
-/**
- * 直接输入Json文本
- * @param {*} json
- */
-function outputVueCode(json, options = {}) {
-  jsonObj = JSON.parse(json);
-
-  return outputVueCodeWithJsonObj(jsonObj, options);
-}
-
-/**
- * 输入Json对象
- * @param {*} jsonObj
- */
-function outputVueCodeWithJsonObj(_jsonObj, options = {}) {
-  jsonObj = _jsonObj;
-  parseJson(_jsonObj);
-
-  // 对集合进行排序
-  dataSet = sort(dataSet);
-  methodSet = sort(methodSet);
-  classSet = sort(classSet);
-
-  // 生成执行结果
-  return generateResult(options);
 }
 
 function sort(set) {
   return new Set(Array.from(set).sort());
 }
 
-// 递归解析Json
-function parseJson(json) {
-  for (const key in json) {
-    if (json.hasOwnProperty(key)) {
-      const value = json[key];
-      if (value instanceof Array) {
-        value.forEach((item) => parseJson(item));
-      } else if (value instanceof Object) {
-        parseJson(value);
-      } else {
-        deliveryResult(key, value);
-      }
-    }
-  }
-}
-
-// 将所有需要替换的内容通过装饰器逐步替换
-function replaceKeyInfo(options) {
-  return replaceStyles(
-    replaceDatas(
-      replaceMethods(replaceHtmlTemplate(getVueTemplate()), methodSet),
-      dataSet,
-      options
-    ),
-    classSet
-  );
-}
-
-function replaceHtmlTemplate(template) {
+function replaceHtmlTemplate(template, jsonObj) {
   const defaultOptions = {
     attributeNamePrefix: "@_",
     attrNodeName: false, //default is false
@@ -514,55 +455,28 @@ function replaceHtmlTemplate(template) {
   return template.replace("<!--在此自动生成-->", xml);
 }
 
-// 分发解析结果
-function deliveryResult(key, value) {
-  if (key === "class") {
-    const classes = value.split(" ");
-    classes.forEach((item) => {
-      // 处理多个空字符串
-      if (!item) return;
-      classSet.add(item);
-    });
-  } else if (/^v-on/g.test(key) || /^@/g.test(key)) {
-    // 匹配@,v-on
-    let expresionArray = null;
-    if (checkIsVar(value)) {
-      methodSet.add(value);
-    } else if ((expresionArray = findVarFormExpression(value)).length > 0) {
-      // 如果是表达式的话，则一定代表是变量参与了运算
-      expresionArray.forEach((element) => {
-        dataSet.add(element);
-      });
-    }
-    // TODO 支持自定义传参情况：handleJump(scope.row.id, scope.row.name)
-  } else if (/^v-/g.test(key) || /^:+/g.test(key)) {
-    // 匹配v-,:(v-bind)
-    let expresionArray = null;
-    if (checkIsVar(value)) {
-      dataSet.add(value);
-    } else if ((expresionArray = findVarFormExpression(value)).length > 0) {
-      expresionArray.forEach((element) => {
-        dataSet.add(element);
-      });
-    }
-  } else if (key === "__text__") {
-    // 匹配v-text,{{}}
-    if (/[{]{2}.+[}]{2}/g.test(value)) {
-      // 用于匹配v-text {{}}
-      const temp = findVarFormExpression(value);
-      temp.forEach((element) => {
-        dataSet.add(element);
-      });
-    }
-  } else ;
+
+function getVueTemplate() {
+  return vueTemplate();
 }
 
 /**
- * 检查这个值是不是符合一个变量的规则, 这里情况特殊，不可以以大写字母开头，以驼峰命名为准
+ * 获取这个变量的实际key
  * @param {*} value
  */
-function checkIsVar(value) {
-  return /^[_a-z]{1}[_0-9a-zA-Z]*$/g.test(value);
+function getVarName(value) {
+  let result = null;
+  if (/^[_a-z]{1}[_0-9a-zA-Z]*$/g.test(value)) {
+    result = value;
+  } else if (value.indexOf('.') > 0 && getVarName(value.split('.')[0])) { //这个case用于处理xxx.yy的情况，需提取出xxx
+    result = value.split('.')[0];
+  } else if (value.indexOf('in') > 0) { // 匹配v-for="xx in yy", 提取yy
+    const temp = value.split(' in ');// 防止匹配到index这样容易混淆的变量
+    if (temp.length === 2) {
+      result = getVarName(temp[1].trim());
+    }
+  }
+  return result;
 }
 
 /**
@@ -581,20 +495,137 @@ function findVarFormExpression(expression) {
   }
 }
 
-function generateResult(options) {
-  // 需要输出的结果有：
-  // 1.html template
-  // 1) 支持解析v-model/@click/
-  // 2.script template
-  // 3.style template
-  // 返回一个格式化后的字符串
-  return replaceKeyInfo(options);
+class CodeGenerator {
+
+  constructor(options = {}) {
+    this.options = options;
+    // 解析后的Json对象
+    this.jsonObj = null;
+    // 类定义放入其中
+    this.classSet = new Set();
+    // 事件放入其中
+    this.methodSet = new Set();
+    // 数据引用放入其中
+    this.dataSet = new Set();
+  }
+
+  clearDataSet() {
+    this.classSet.clear();
+    this.methodSet.clear();
+    this.dataSet.clear();
+  }
+
+  /**
+    * 直接输入Json文本
+    * @param {*} json
+    */
+  outputVueCode(json) {
+    this.jsonObj = JSON.parse(json);
+    return this.outputVueCodeWithJsonObj(jsonObj);
+  }
+
+  /**
+   * 输入Json对象
+   * @param {*} jsonObj
+   */
+  outputVueCodeWithJsonObj(_jsonObj) {
+    this.jsonObj = _jsonObj;
+
+    // 解析对象
+    this.parseJson(_jsonObj);
+
+    // 对集合进行排序
+    this.dataSet = sort(this.dataSet);
+    this.methodSet = sort(this.methodSet);
+    this.classSet = sort(this.classSet);
+
+    // 生成执行结果
+    return this.generateResult();
+  }
+
+
+  // 将所有需要替换的内容通过装饰器逐步替换
+  replaceKeyInfo() {
+    // 将对象转换为html并替换
+    const templateTemp = replaceHtmlTemplate(getVueTemplate(), this.jsonObj);
+    // 生成方法
+    const methodTemp = replaceMethods(templateTemp, this.methodSet, this.options);
+    // 生成data
+    const dataTemp = replaceDatas(methodTemp, this.dataSet, this.options);
+    // 生成class
+    const styleTemp = replaceStyles(dataTemp, this.classSet, this.options);
+    return styleTemp;
+  }
+
+  // 分发解析结果
+  deliveryResult(key, value) {
+    if (key === "class") {
+      const classes = value.split(" ");
+      classes.forEach((item) => {
+        // 处理多个空字符串
+        if (!item) return;
+        this.classSet.add(item);
+      });
+    } else if (/^v-on/g.test(key) || /^@/g.test(key)) {
+      // 匹配@,v-on
+      if (getVarName(value)) {
+        this.methodSet.add(value);
+      }
+    } else if (/^v-/g.test(key) || /^:+/g.test(key)) {
+      // 优先使Method消费，因为有的:也是method
+      if (this.options.checkIsMethodDirectives && this.options.checkIsMethodDirectives(key)) {
+        value = getVarName(value);
+        value && this.methodSet.add(value);
+      } else
+      // 业务侧可能会全部消费/^:+/g.test(key)
+      if (this.options.checkIsDataDirectives && this.options.checkIsDataDirectives(key)) {
+        value = getVarName(value);
+        value && this.dataSet.add(value);
+      } else {
+        this.options.unSupportedKey && this.options.unSupportedKey(key, value);
+      }
+    } else if (key === "__text__") {
+      // 匹配v-text,{{}}
+      if (/[{]{2}.+[}]{2}/g.test(value)) {
+        // 用于匹配v-text {{}}
+        const temp = findVarFormExpression(value);
+        temp.forEach((element) => {
+          this.dataSet.add(element);
+        });
+      }
+    } else {
+      // 通过回调给业务实现方做处理
+      this.options.unSupportedKey && this.options.unSupportedKey(key, value);
+    }
+  }
+
+
+  generateResult() {
+    // 需要输出的结果有：
+    // 1.html template
+    // 1) 支持解析v-model/@click/
+    // 2.script template
+    // 3.style template
+    // 返回一个格式化后的字符串
+    return this.replaceKeyInfo();
+  }
+
+
+  // 递归解析Json
+  parseJson(json) {
+    for (const key in json) {
+      if (json.hasOwnProperty(key)) {
+        const value = json[key];
+        if (value instanceof Array) {
+          value.forEach((item) => this.parseJson(item));
+        } else if (value instanceof Object) {
+          this.parseJson(value);
+        } else {
+          this.deliveryResult(key, value);
+        }
+      }
+    }
+  }
 }
 
-function getVueTemplate() {
-  return vueTemplate();
-}
-
-exports.clearDataSet = clearDataSet;
-exports.outputVueCode = outputVueCode;
-exports.outputVueCodeWithJsonObj = outputVueCodeWithJsonObj;
+exports.CodeGenerator = CodeGenerator;
