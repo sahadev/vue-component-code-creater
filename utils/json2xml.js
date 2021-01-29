@@ -18,6 +18,7 @@ const defaultOptions = {
   attrValueProcessor: function (a) {
     return a;
   },
+  singleTags: [],
   attributeProtectArray: [] // 哪些属性的值为''但需要渲染出来，默认：如果value为''就不生成key=value，只生成key
 };
 
@@ -33,6 +34,7 @@ const props = [
   'supressEmptyNode',
   'tagValueProcessor',
   'attrValueProcessor',
+  'singleTags',
   'attributeProtectArray'
 ];
 
@@ -97,22 +99,22 @@ Parser.prototype.j2x = function (jObj, level) {
       val += this.indentate(level) + '<' + key + '/' + this.tagEndChar;
     } else if (jObj[key] instanceof Date) {
       val += this.buildTextNode(jObj[key], key, '', level);
-    } else if (key === '__children'){ // 生成子节点
+    } else if (key === '__children') { // 生成子节点
       const item = jObj[key];
 
-      if(item instanceof Array){
-        item.forEach(i =>{
+      if (item instanceof Array) {
+        item.forEach(i => {
           const result = this.j2x(i, level + 1);
           val += result.val;
         })
-      } else 
-      if (typeof item === 'object') {
-        console.info(`不应该出现的意外`)
-      } else {
-        val += this.buildTextNode(item, key, '', level);
-      }
-    } 
-    
+      } else
+        if (typeof item === 'object') {
+          console.info(`不应该出现的意外`)
+        } else {
+          val += this.buildTextNode(item, key, '', level);
+        }
+    }
+
     else if (typeof jObj[key] !== 'object') {
       //premitive type
       const attr = this.isAttribute(key);
@@ -125,7 +127,7 @@ Parser.prototype.j2x = function (jObj, level) {
       if (attr) {
         if (typeof jObj[key] === "boolean" && jObj[key]) {
           attrStr += ` ${key} `
-        } else if(jObj[key] || this.options.attributeProtectArray.includes(key)){
+        } else if (jObj[key] || this.options.attributeProtectArray.includes(key)) {
           attrStr += ' ' + key + '="' + this.options.attrValueProcessor('' + jObj[key]) + '"';
         } else {
           attrStr += ' ' + key;
@@ -150,8 +152,8 @@ Parser.prototype.j2x = function (jObj, level) {
         }
       }
     }
-    
-    
+
+
     else if (Array.isArray(jObj[key])) {
       //repeated nodes
       if (this.isCDATA(key)) {
@@ -219,7 +221,7 @@ function replaceCDATAarr(str, cdata) {
 function buildObjectNode(val, key, attrStr, level) {
   if (attrStr && !val.includes('<')) {
 
-    if (key === "img" || key === "a-icon" || key === "input") {
+    if (key === "img" || key === "a-icon" || key === "input" || (this.options.singleTags && this.options.singleTags.includes(key))) {
       return (this.indentate(level) + '<' + key + attrStr + '/>');
     }
 
