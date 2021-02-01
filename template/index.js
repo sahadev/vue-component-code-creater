@@ -10,7 +10,6 @@ export default {
   components: {},
   data() {
     return {
-      // 在此自动生成
       // $datas
     };
   },
@@ -24,9 +23,7 @@ export default {
   updated() {},
   destoried() {},
   methods: {
-    // 在此自动生成
     request() {
-      // 网络请求，可选
     },
     // $eventMethods
   },
@@ -35,7 +32,6 @@ export default {
 </script>
 
 <style scoped>
-/*  在此自动生成 */
 /** $stylesTemplate */
 </style>
   `;
