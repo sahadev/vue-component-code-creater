@@ -21,7 +21,7 @@ export default {
   mounted() {},
   beforeUpdate() {},
   updated() {},
-  destoried() {},
+  destoryed() {},
   methods: {
     request() {
     },
