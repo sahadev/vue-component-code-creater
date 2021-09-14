@@ -4,7 +4,7 @@ import { Parser } from "../utils/json2xml.js";
 import { scriptTemplate } from "../template/script.js"
 import stringifyObject from "stringify-object";
 import _ from "lodash";
-const { merge } = _;
+const { merge, cloneDeep } = _;
 import prettier from "prettier/standalone.js";
 import parserBabel from "prettier/parser-babel.js";
 
@@ -95,12 +95,23 @@ export class CodeGenerator {
     this.methodSet = new Set();
     // 数据引用放入其中
     this.dataSet = new Set();
+
+    this.externalJS = {};
   }
 
   clearDataSet() {
     this.classSet.clear();
     this.methodSet.clear();
     this.dataSet.clear();
+  }
+
+
+  /**
+   * 设置外部编辑代码
+   * @param {*} code 
+   */
+  setExternalJS(JSCodeInfo) {
+    this.externalJS = cloneDeep(JSCodeInfo);
   }
 
   /**
@@ -150,10 +161,10 @@ export class CodeGenerator {
     // 合并外部脚本对象
     let externalData = {};
 
-    if (this.options.getExternalJS) {
-      externalData = this.options.getExternalJS.data();
+    if (this.externalJS && typeof this.externalJS.data === 'function') {
+      externalData = this.externalJS.data();
       // 防止在后面的生成污染新的对象
-      delete this.options.getExternalJS.data;
+      delete this.externalJS.data;
     }
 
     // 生成新的data返回值
@@ -165,8 +176,8 @@ export class CodeGenerator {
 
     let externalJSLogic = {};
 
-    if (this.options.getExternalJS) {
-      externalJSLogic = this.options.getExternalJS;
+    if (this.externalJS) {
+      externalJSLogic = this.externalJS;
     }
 
     const mergedJSObject = merge(JSCodeInfo, externalJSLogic);
@@ -175,7 +186,7 @@ export class CodeGenerator {
     const finalJSCode = stringifyObject(mergedJSObject, {
       transform: (object, property, originalResult) => {
         if (!originalResult.match(/^\([^\(]+/g) && !originalResult.match(/^\{/g)) { // 不对以(/{ 开头的情况做处理，只对包含有方法名的情况做处理
-          const after = originalResult.replace(/[^\(]+?\(([\w,\s]*)\)/g, '\($1\)=>');
+          const after = originalResult.replace(/[^\(]+?\(([\w,\s]*)\)/, '\($1\)=>');
           return after;
         }
 
