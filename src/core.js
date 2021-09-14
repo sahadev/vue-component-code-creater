@@ -1,6 +1,10 @@
 import vueTemplate from "../template/index.js";
-import { replaceDatas, replaceMethods, replaceStyles } from "./replace";
-import { Parser } from "../utils/json2xml";
+import { replaceDatas, replaceMethods, replaceStyles } from "./replace.js";
+import { Parser } from "../utils/json2xml.js";
+import { scriptTemplate } from "../template/script.js"
+import stringifyObject from "stringify-object";
+import _ from "lodash";
+const { merge } = _;
 
 const rawAdd = Set.prototype.add;
 Set.prototype.add = function (value) {
@@ -103,7 +107,7 @@ export class CodeGenerator {
     */
   outputVueCode(json) {
     this.jsonObj = JSON.parse(json);
-    return this.outputVueCodeWithJsonObj(jsonObj);
+    return this.outputVueCodeWithJsonObj(this.jsonObj);
   }
 
   /**
@@ -130,12 +134,60 @@ export class CodeGenerator {
   replaceKeyInfo() {
     // 将对象转换为html并替换
     const templateTemp = replaceHtmlTemplate(getVueTemplate(), this.jsonObj);
+
+    // ==================== 生成脚本 ====================
+
     // 生成方法
-    const methodTemp = replaceMethods(templateTemp, this.methodSet, this.options);
+    const methodTemp = replaceMethods(scriptTemplate, this.methodSet, this.options);
     // 生成data
     const dataTemp = replaceDatas(methodTemp, this.dataSet, this.options);
+
+    // 转化为对象
+    const JSCodeInfo = eval(`(function(){return ${dataTemp}})()`);
+
+    // 合并外部脚本对象
+    let externalData = {};
+
+    if (this.options.getExternalJS) {
+      externalData = this.options.getExternalJS.data();
+      // 防止在后面的生成污染新的对象
+      delete this.options.getExternalJS.data;
+    }
+
+    // 生成新的data返回值
+    const newData = merge({}, JSCodeInfo.data(), externalData);
+
+    const dataFunction = new Function(`return ${stringifyObject(newData)}`);
+
+    JSCodeInfo.data = dataFunction;
+
+    let externalJSLogic = {};
+
+    if(this.options.getExternalJS){
+      externalJSLogic = this.options.getExternalJS;
+    }
+
+    const mergedJSObject = merge(JSCodeInfo, externalJSLogic);
+
+    // 序列化为脚本代码
+    const finalJSCode = stringifyObject(mergedJSObject, {
+      transform: (object, property, originalResult) => {
+        if (!originalResult.match(/^\([^\(]+/g) && !originalResult.match(/^\{/g)) { // 不对以(/{ 开头的情况做处理，只对包含有方法名的情况做处理
+          const after = originalResult.replace(/[^\(]+?\(([\w,\s]*)\)/g, '\($1\)=>');
+          return after;
+        }
+
+        return originalResult;
+      }
+    });
+
+    // ==================== 生成脚本 ====================
+
+    // 插入到最终模板
+    const JSTemp = templateTemp.replace('// $script', finalJSCode.replace(/\s*/mgi, ''))
+
     // 生成class
-    const styleTemp = replaceStyles(dataTemp, this.classSet, this.options);
+    const styleTemp = replaceStyles(JSTemp, this.classSet, this.options);
     return styleTemp;
   }
 
@@ -159,13 +211,13 @@ export class CodeGenerator {
         value = getVarName(value);
         value && this.methodSet.add(value);
       } else
-      // 业务侧可能会全部消费/^:+/g.test(key)
-      if (this.options.checkIsDataDirectives && this.options.checkIsDataDirectives(key)) {
-        value = getVarName(value);
-        value && this.dataSet.add(value);
-      } else {
-        this.options.unSupportedKey && this.options.unSupportedKey(key, value);
-      }
+        // 业务侧可能会全部消费/^:+/g.test(key)
+        if (this.options.checkIsDataDirectives && this.options.checkIsDataDirectives(key)) {
+          value = getVarName(value);
+          value && this.dataSet.add(value);
+        } else {
+          this.options.unSupportedKey && this.options.unSupportedKey(key, value);
+        }
     } else if (key === "__text__") {
       // 匹配v-text,{{}}
       if (/[{]{2}.+[}]{2}/g.test(value)) {

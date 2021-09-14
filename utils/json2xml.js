@@ -1,6 +1,6 @@
 'use strict';
 //parse Empty Node as self closing node
-import { buildOptions } from './util';
+import { buildOptions } from './util.js';
 
 const defaultOptions = {
   attributeNamePrefix: '@_',

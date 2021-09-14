@@ -54,6 +54,7 @@ export function replaceMethods(template, set, options) {
 export function replaceStyles(template, set, options) {
   return template.replace("/** $stylesTemplate */", convertStyles(set, options));
 }
+
 // 从模板中替换样式
 export function replaceDatas(template, set, options) {
   const defaultCode = convertDatas(set, options);

@@ -5,30 +5,7 @@ export default function () {
   <template> <!--在此自动生成--> </template>
 
 <script>
-export default {
-  props: [],
-  components: {},
-  data() {
-    return {
-      // $datas
-    };
-  },
-  watch: {},
-  computed: {},
-  beforeCreate() {},
-  created() {},
-  beforeMount() {},
-  mounted() {},
-  beforeUpdate() {},
-  updated() {},
-  destoryed() {},
-  methods: {
-    request() {
-    },
-    // $eventMethods
-  },
-  fillter: {},
-};
+export default // $script
 </script>
 
 <style scoped>

@@ -12,7 +12,7 @@
 如何运行:
 
 ```
-    npm run test.js
+    npm run test
 ```
 
 2020 年 09 月 16 日 11:33:10
