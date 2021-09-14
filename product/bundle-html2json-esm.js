@@ -20,9 +20,10 @@ function getNodeContent(node) {
 }*/
 function generateNewNode(tagName, attributes = {}) {
   // 构建新节点
-  const newNode = {};
-  newNode[tagName] = attributes;
   attributes.__children = [];
+  const newNode = {
+    [tagName]: attributes
+  };
   return newNode;
 }
 
@@ -52,7 +53,7 @@ function parseHtml(htmlData) {
         lastAccessStack.pop();
         currentAccessObject = lastAccessStack[lastAccessStack.length - 1];
       },
-      onend(){
+      onend() {
         resolve(root);
       },
 
