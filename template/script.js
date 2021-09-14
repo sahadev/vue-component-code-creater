@@ -13,7 +13,7 @@ export const scriptTemplate = `{
     beforeMount() {},
     mounted() {},
     beforeUpdate() {},
-    updated(args1, args2) {},
+    updated() {},
     destoryed() {},
     methods: {
       request() {

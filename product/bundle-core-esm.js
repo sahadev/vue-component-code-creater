@@ -2,6 +2,8 @@
 
 import stringifyObject from 'stringify-object';
 import _ from 'lodash';
+import prettier from 'prettier/standalone.js';
+import parserBabel from 'prettier/parser-babel.js';
 
 // 导出组件模板文件
 
@@ -410,7 +412,7 @@ const scriptTemplate = `{
     beforeMount() {},
     mounted() {},
     beforeUpdate() {},
-    updated(args1, args2) {},
+    updated() {},
     destoryed() {},
     methods: {
       request() {
@@ -575,11 +577,13 @@ class CodeGenerator {
 
     const dataFunction = new Function(`return ${stringifyObject(newData)}`);
 
+    console.info(dataFunction.toString());
+
     JSCodeInfo.data = dataFunction;
 
     let externalJSLogic = {};
 
-    if(this.options.getExternalJS){
+    if (this.options.getExternalJS) {
       externalJSLogic = this.options.getExternalJS;
     }
 
@@ -599,8 +603,10 @@ class CodeGenerator {
 
     // ==================== 生成脚本 ====================
 
+    const beautiful = prettier.format(`export default ` + finalJSCode, { semi: false, parser: "babel", plugins: [parserBabel], });
+    const excludeUnuseal = beautiful.replace('export default ', '');
     // 插入到最终模板
-    const JSTemp = templateTemp.replace('// $script', finalJSCode.replace(/\s*/mgi, ''));
+    const JSTemp = templateTemp.replace('// $script', excludeUnuseal);
 
     // 生成class
     const styleTemp = replaceStyles(JSTemp, this.classSet, this.options);

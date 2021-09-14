@@ -5,6 +5,8 @@ import { scriptTemplate } from "../template/script.js"
 import stringifyObject from "stringify-object";
 import _ from "lodash";
 const { merge } = _;
+import prettier from "prettier/standalone.js";
+import parserBabel from "prettier/parser-babel.js";
 
 const rawAdd = Set.prototype.add;
 Set.prototype.add = function (value) {
@@ -163,7 +165,7 @@ export class CodeGenerator {
 
     let externalJSLogic = {};
 
-    if(this.options.getExternalJS){
+    if (this.options.getExternalJS) {
       externalJSLogic = this.options.getExternalJS;
     }
 
@@ -183,8 +185,10 @@ export class CodeGenerator {
 
     // ==================== 生成脚本 ====================
 
+    const beautiful = prettier.format(`export default ` + finalJSCode, { semi: false, parser: "babel", plugins: [parserBabel], });
+    const excludeUnuseal = beautiful.replace('export default ', '');
     // 插入到最终模板
-    const JSTemp = templateTemp.replace('// $script', finalJSCode.replace(/\s*/mgi, ''))
+    const JSTemp = templateTemp.replace('// $script', excludeUnuseal);
 
     // 生成class
     const styleTemp = replaceStyles(JSTemp, this.classSet, this.options);
