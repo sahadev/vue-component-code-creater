@@ -1,9 +1,20 @@
+'use strict';
+
 //该文件会遍历Object，获取关键的class,事件,data, 最终拼装为一个完整的SFC文件
 
-import stringifyObject from 'stringify-object';
-import _ from 'lodash';
-import prettier from 'prettier/standalone.js';
-import parserBabel from 'prettier/parser-babel.js';
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var stringifyObject = require('stringify-object');
+var _ = require('lodash');
+var prettier = require('prettier/standalone.js');
+var parserBabel = require('prettier/parser-babel.js');
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var stringifyObject__default = /*#__PURE__*/_interopDefaultLegacy(stringifyObject);
+var ___default = /*#__PURE__*/_interopDefaultLegacy(_);
+var prettier__default = /*#__PURE__*/_interopDefaultLegacy(prettier);
+var parserBabel__default = /*#__PURE__*/_interopDefaultLegacy(parserBabel);
 
 // 导出组件模板文件
 
@@ -424,7 +435,7 @@ const scriptTemplate = `{
     fillter: {},
   };`;
 
-const { merge, cloneDeep } = _;
+const { merge, cloneDeep } = ___default["default"];
 
 const rawAdd = Set.prototype.add;
 Set.prototype.add = function (value) {
@@ -588,7 +599,7 @@ class CodeGenerator {
     // 生成新的data返回值
     const newData = merge({}, JSCodeInfo.data(), externalData);
 
-    const dataFunction = new Function(`return ${stringifyObject(newData)}`);
+    const dataFunction = new Function(`return ${stringifyObject__default["default"](newData)}`);
 
     JSCodeInfo.data = dataFunction;
 
@@ -601,7 +612,7 @@ class CodeGenerator {
     const mergedJSObject = merge(JSCodeInfo, externalJSLogic);
 
     // 序列化为脚本代码
-    const finalJSCode = stringifyObject(mergedJSObject, {
+    const finalJSCode = stringifyObject__default["default"](mergedJSObject, {
       transform: (object, property, originalResult) => {
         if (!originalResult.match(/^\([^\(]+/g) && !originalResult.match(/^\{/g)) { // 不对以(/{ 开头的情况做处理，只对包含有方法名的情况做处理
           const after = originalResult.replace(/[^\(]+?\(([\w,\s]*)\)/, '\($1\)=>');
@@ -614,7 +625,7 @@ class CodeGenerator {
 
     // ==================== 生成脚本 ====================
 
-    const beautiful = prettier.format(`export default ` + finalJSCode, { semi: false, parser: "babel", plugins: [parserBabel], });
+    const beautiful = prettier__default["default"].format(`export default ` + finalJSCode, { semi: false, parser: "babel", plugins: [parserBabel__default["default"]], });
     const excludeUnuseal = beautiful.replace('export default ', '');
     // 插入到最终模板
     const JSTemp = templateTemp.replace('// $script', excludeUnuseal);
@@ -695,4 +706,4 @@ class CodeGenerator {
   }
 }
 
-export { CodeGenerator };
+exports.CodeGenerator = CodeGenerator;

@@ -2,7 +2,9 @@
 
 export default function () {
   return `
-  <template> <!--在此自动生成--> </template>
+<template> 
+  <!--在此自动生成--> 
+</template>
 
 <script>
 export default // $script
