@@ -14,7 +14,7 @@ export const scriptTemplate = `{
     mounted() {},
     beforeUpdate() {},
     updated() {},
-    destoryed() {},
+    destroyed() {},
     methods: {
       request() {
       },
