@@ -58,6 +58,9 @@ function parseHtml(htmlData) {
       onerror(error) {
         reject(error);
       }
+    }, {
+      lowerCaseAttributeNames: false,
+      lowerCaseTags: false,
     });
     parser.write(
       htmlData

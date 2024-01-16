@@ -1,6 +1,9 @@
 ## Vue 组件生成工具
 
-支持vue文件的解析与生成，并可以通过Json结构的对象输出代码。
+支持将vue文件解析为Json结构的对象。
+支持将Json结构编译为Vue文件。
+
+此工具主要用在VCC代码生成编辑器中，具体请参见：[https://vcc3.surge.sh/](https://vcc3.surge.sh/)
 
 目前支持解析class,@,v-on,{{}}，
 指令v-或:通过checkIsDataDirectives、checkIsMethodDirectives两个方法由使用方判定是data还是method，
